@@ -1,0 +1,11 @@
+<Project>
+  <!-- Imported before individual projects. Keeping generated files out of the
+       Codex workspace also prevents multiple projects sharing project.assets.json. -->
+  <PropertyGroup>
+    <RhinoSplatBuildRoot Condition="'$(RhinoSplatBuildRoot)' == ''">$([System.IO.Path]::GetTempPath())RhinoSplatBuild/$(MSBuildProjectName)/</RhinoSplatBuildRoot>
+    <BaseIntermediateOutputPath>$(RhinoSplatBuildRoot)obj\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>$(RhinoSplatBuildRoot)obj\</MSBuildProjectExtensionsPath>
+    <BaseOutputPath>$(RhinoSplatBuildRoot)bin\</BaseOutputPath>
+    <RestoreConfigFile>$(MSBuildThisFileDirectory)NuGet.Config</RestoreConfigFile>
+  </PropertyGroup>
+</Project>

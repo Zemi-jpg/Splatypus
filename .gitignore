@@ -1,0 +1,15 @@
+# Build outputs
+[Bb]in/
+[Oo]bj/
+*.dll
+*.exe
+*.pdb
+*.runtimeconfig.json
+*.deps.json
+.nuget-packages/
+
+# IDE-local settings and logs
+.vs/
+*.user
+*.suo
+*.log

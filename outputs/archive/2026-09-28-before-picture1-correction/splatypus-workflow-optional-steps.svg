@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4200" height="1400" viewBox="0 0 4200 1400"><title>Splatypus workflow — separate re-alignment</title><desc>Undistortion replaces the original base images and matching model. Alignment always reads that base and writes separate aligned BIN and TXT models. Brush uses base images with the base model by default, or the aligned model through its optional Sparse Model Override. Alignment never feeds back into the base.</desc><defs>
+<marker id="a879cae" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#879cae"/></marker>
+<marker id="a188575" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#188575"/></marker>
+<marker id="a8255b4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10Z" fill="#8255b4"/></marker>
+</defs><rect width="4200" height="1400" fill="#f7f9fc"/><g font-family="Segoe UI, Arial, sans-serif">
+<text x="60" y="85" font-size="53" fill="#183650" font-weight="600" text-anchor="start">Splatypus workflow</text>
+<text x="60" y="138" font-size="30" fill="#586f83" font-weight="400" text-anchor="start">Undistortion updates the base dataset · re-alignment writes a separate model</text>
+<text x="4140" y="85" font-size="23" fill="#2479ae" font-weight="600" text-anchor="end">UPDATED 28 SEP 2026</text>
+<text x="60" y="205" font-size="25" fill="#2479ae" font-weight="600" text-anchor="start">01</text>
+<text x="108" y="205" font-size="29" fill="#183650" font-weight="600" text-anchor="start">Images</text>
+<path d="M60 229 H370" stroke="#d5dfe9" stroke-width="2"/>
+<text x="430" y="205" font-size="25" fill="#2479ae" font-weight="600" text-anchor="start">02</text>
+<text x="478" y="205" font-size="29" fill="#183650" font-weight="600" text-anchor="start">Reconstruct</text>
+<path d="M430 229 H840" stroke="#d5dfe9" stroke-width="2"/>
+<text x="900" y="205" font-size="25" fill="#2479ae" font-weight="600" text-anchor="start">03</text>
+<text x="948" y="205" font-size="29" fill="#183650" font-weight="600" text-anchor="start">Base dataset</text>
+<path d="M900 229 H1820" stroke="#d5dfe9" stroke-width="2"/>
+<text x="1930" y="205" font-size="25" fill="#2479ae" font-weight="600" text-anchor="start">04</text>
+<text x="1978" y="205" font-size="29" fill="#183650" font-weight="600" text-anchor="start">Optional alignment / Brush handoff</text>
+<path d="M1930 229 H2810" stroke="#d5dfe9" stroke-width="2"/>
+<text x="2920" y="205" font-size="25" fill="#2479ae" font-weight="600" text-anchor="start">05</text>
+<text x="2968" y="205" font-size="29" fill="#183650" font-weight="600" text-anchor="start">Train</text>
+<path d="M2920 229 H3290" stroke="#d5dfe9" stroke-width="2"/>
+<text x="3400" y="205" font-size="25" fill="#2479ae" font-weight="600" text-anchor="start">06</text>
+<text x="3448" y="205" font-size="29" fill="#183650" font-weight="600" text-anchor="start">Visualize</text>
+<path d="M3400 229 H4140" stroke="#d5dfe9" stroke-width="2"/>
+<path d="M370 495 H430" fill="none" stroke="#879cae" stroke-width="3.5"  marker-end="url(#a879cae)"/>
+<path d="M840 495 H915" fill="none" stroke="#879cae" stroke-width="3.5"  marker-end="url(#a879cae)"/>
+<path d="M1105 495 H1210" fill="none" stroke="#879cae" stroke-width="3.5"  marker-end="url(#a879cae)"/>
+<path d="M1010 590 V780" fill="none" stroke="#188575" stroke-width="3.5"  marker-end="url(#a188575)"/>
+<path d="M1415 887 H1515 V615" fill="none" stroke="#188575" stroke-width="3.5"  marker-end="url(#a188575)"/>
+<path d="M1820 495 H2280" fill="none" stroke="#188575" stroke-width="3.5"  marker-end="url(#a188575)"/>
+<path d="M2810 495 H2920" fill="none" stroke="#879cae" stroke-width="3.5"  marker-end="url(#a879cae)"/>
+<path d="M3290 495 H3400" fill="none" stroke="#8255b4" stroke-width="3.5"  marker-end="url(#a8255b4)"/>
+<path d="M1750 615 V800" fill="none" stroke="#8255b4" stroke-width="3.5" stroke-dasharray="10 8" marker-end="url(#a8255b4)"/>
+<path d="M2060 910 H2190" fill="none" stroke="#8255b4" stroke-width="3.5"  marker-end="url(#a8255b4)"/>
+<path d="M2660 910 H2790" fill="none" stroke="#8255b4" stroke-width="3.5"  marker-end="url(#a8255b4)"/>
+<path d="M3030 795 V700 H2620 V615" fill="none" stroke="#8255b4" stroke-width="3.5"  marker-end="url(#a8255b4)"/>
+<path d="M3490 950 H3630" fill="none" stroke="#8255b4" stroke-width="3.5" stroke-dasharray="10 8" marker-end="url(#a8255b4)"/>
+<rect x="60" y="390" width="310" height="210" rx="18" fill="#fff" stroke="#d4dfeb" stroke-width="2"/>
+<text x="84" y="436" font-size="31" fill="#183650" font-weight="600" text-anchor="start">SP Media Import</text>
+<text x="84" y="482" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Photos / video</text>
+<text x="84" y="520" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">FFmpeg → .JPG</text>
+<text x="84" y="558" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Project images/</text>
+<rect x="430" y="375" width="410" height="240" rx="18" fill="#eaf2fa" stroke="#c1d7e9" stroke-width="2"/>
+<text x="454" y="421" font-size="31" fill="#183650" font-weight="600" text-anchor="start">SP COLMAP All</text>
+<text x="454" y="467" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Extract → match</text>
+<text x="454" y="505" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Reconstruct cameras</text>
+<text x="454" y="543" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">+ sparse 3D points</text>
+<text x="454" y="581" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">One terminal for all stages</text>
+<path d="M1010 400 L1105 495 L1010 590 L915 495 Z" fill="#edf7f3" stroke="#9cc4b6" stroke-width="2"/>
+<text x="1010" y="492" font-size="26" fill="#183650" font-weight="600" text-anchor="middle">Undistort?</text>
+<text x="1010" y="363" font-size="22" fill="#188575" font-weight="600" text-anchor="middle">OPTIONAL</text>
+<text x="1155" y="470" font-size="24" fill="#586f83" font-weight="400" text-anchor="middle">No</text>
+<text x="1032" y="680" font-size="24" fill="#188575" font-weight="400" text-anchor="start">Yes</text>
+<rect x="875" y="780" width="540" height="215" rx="18" fill="#edf7f3" stroke="#b6d8ca" stroke-width="2"/>
+<text x="899" y="826" font-size="31" fill="#183650" font-weight="600" text-anchor="start">SP Undistort Images</text>
+<text x="899" y="872" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Correct images + calibration</text>
+<text x="899" y="910" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Overwrite the base pair together</text>
+<text x="899" y="948" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">No separate undistorted dataset</text>
+<rect x="1210" y="375" width="610" height="240" rx="18" fill="#e5f3ed" stroke="#a3ccba" stroke-width="2"/>
+<text x="1234" y="421" font-size="31" fill="#183650" font-weight="600" text-anchor="start">SP Active Dataset · BASE</text>
+<text x="1234" y="467" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Original OR undistorted images</text>
+<text x="1234" y="505" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">images/  +  colmap/sparse/0/</text>
+<text x="1234" y="543" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Matching .JPG + .BIN camera model</text>
+<text x="1234" y="581" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Alignment preserves this base</text>
+<text x="2050" y="433" font-size="28" fill="#188575" font-weight="600" text-anchor="middle">Dataset input</text>
+<text x="2050" y="470" font-size="25" fill="#586f83" font-weight="400" text-anchor="middle">Active images + base .BIN</text>
+<rect x="2280" y="375" width="530" height="240" rx="18" fill="#edf7f3" stroke="#b6d8ca" stroke-width="2"/>
+<text x="2304" y="421" font-size="31" fill="#183650" font-weight="600" text-anchor="start">SP Brush Dataset</text>
+<text x="2304" y="467" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">Dataset → active base dataset</text>
+<text x="2304" y="505" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">Sparse → optional aligned .BIN</text>
+<text x="2304" y="543" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">Leave Sparse empty → base model</text>
+<text x="2304" y="581" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">Keep Prepare enabled</text>
+<rect x="2920" y="390" width="370" height="210" rx="18" fill="#f2edf8" stroke="#d6c6e7" stroke-width="2"/>
+<text x="2944" y="436" font-size="31" fill="#183650" font-weight="600" text-anchor="start">SP Brush Train</text>
+<text x="2944" y="482" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Train Gaussian splats</text>
+<text x="2944" y="520" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Export sp_*.ply</text>
+<text x="2944" y="558" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Gaussian splat data</text>
+<text x="3345" y="466" font-size="29" fill="#8255b4" font-weight="600" text-anchor="middle">.PLY</text>
+<rect x="3400" y="365" width="740" height="265" rx="18" fill="#eaf2fa" stroke="#c1d7e9" stroke-width="2"/>
+<text x="3424" y="411" font-size="31" fill="#183650" font-weight="600" text-anchor="start">Rhino visualization</text>
+<text x="3424" y="457" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">SP Splat Preview → coloured point cloud</text>
+<text x="3424" y="495" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Rhino Gaussian Splatting OR Krill → splats</text>
+<text x="3424" y="533" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Optional +90° X visualization copy: _rgs.ply</text>
+<text x="3424" y="571" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Original training PLY remains unchanged</text>
+<text x="1900" y="745" font-size="24" fill="#8255b4" font-weight="600" text-anchor="start">OPTIONAL ALIGNMENT · START FROM THE BASE</text>
+<rect x="1560" y="800" width="500" height="220" rx="18" fill="#f5f1fa" stroke="#dacbe9" stroke-width="2"/>
+<text x="1584" y="846" font-size="31" fill="#183650" font-weight="600" text-anchor="start">SP previews + transforms</text>
+<text x="1584" y="892" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Base .TXT → cloud + cameras</text>
+<text x="1584" y="930" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">SP Geometry Translator</text>
+<text x="1584" y="968" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Move → rotate → uniform scale</text>
+<text x="2125" y="876" font-size="25" fill="#8255b4" font-weight="600" text-anchor="middle">Xforms</text>
+<rect x="2190" y="800" width="470" height="220" rx="18" fill="#f5f1fa" stroke="#dacbe9" stroke-width="2"/>
+<text x="2214" y="846" font-size="31" fill="#183650" font-weight="600" text-anchor="start">SP Align COLMAP Model</text>
+<text x="2214" y="892" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">Read the active BASE model</text>
+<text x="2214" y="930" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">Apply the current transforms</text>
+<text x="2214" y="968" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">Write separate aligned outputs</text>
+<rect x="2790" y="795" width="700" height="250" rx="18" fill="#f2edf8" stroke="#c8b2df" stroke-width="2"/>
+<text x="2814" y="841" font-size="31" fill="#183650" font-weight="600" text-anchor="start">SEPARATE aligned model</text>
+<text x="2814" y="887" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">.BIN → colmap/aligned/sparse/0/</text>
+<text x="2814" y="925" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">.TXT → colmap/aligned/sparse-text/</text>
+<text x="2814" y="963" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">Each Write replaces only these aligned outputs</text>
+<text x="2814" y="1001" font-size="26" fill="#586f83" font-weight="400" text-anchor="start">Repeated writes do not accumulate transforms</text>
+<text x="3100" y="656" font-size="25" fill="#8255b4" font-weight="600" text-anchor="middle">Aligned Sparse Model → Sparse override</text>
+<text x="3555" y="924" font-size="26" fill="#8255b4" font-weight="600" text-anchor="middle">.TXT</text>
+<rect x="3630" y="815" width="510" height="210" rx="18" fill="#f5f1fa" stroke="#dacbe9" stroke-width="2"/>
+<text x="3654" y="861" font-size="31" fill="#183650" font-weight="600" text-anchor="start">Optional aligned preview</text>
+<text x="3654" y="907" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">Aligned Text Model →</text>
+<text x="3654" y="945" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">SP Sparse Point Cloud /</text>
+<text x="3654" y="983" font-size="27" fill="#586f83" font-weight="400" text-anchor="start">SP Camera Planes</text>
+<text x="1860" y="1092" font-size="25" fill="#586f83" font-weight="400" text-anchor="middle">Base previews stay connected while you adjust alignment.</text>
+<path d="M60 1180 H4140" stroke="#d5dfe9" stroke-width="2"/>
+<text x="60" y="1230" font-size="23" fill="#188575" font-weight="600" text-anchor="start">UNDISTORT</text>
+<text x="60" y="1272" font-size="27" fill="#183650" font-weight="400" text-anchor="start">Replace base images + calibration together.</text>
+<text x="1500" y="1230" font-size="23" fill="#8255b4" font-weight="600" text-anchor="start">ALIGN</text>
+<text x="1500" y="1272" font-size="27" fill="#183650" font-weight="400" text-anchor="start">Preserve the base; replace only the aligned model.</text>
+<text x="2940" y="1230" font-size="23" fill="#2479ae" font-weight="600" text-anchor="start">AFTER THE BASE CHANGES</text>
+<text x="2940" y="1272" font-size="27" fill="#183650" font-weight="400" text-anchor="start">Write alignment again before aligned training.</text>
+<text x="60" y="1340" font-size="25" fill="#586f83" font-weight="400" text-anchor="start">No original-versus-undistorted selector. The separate aligned branch connects once through Brush’s optional Sparse input.</text></g></svg>

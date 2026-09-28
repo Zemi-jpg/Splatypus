@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms><ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable><EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../GH.SpComponent.cs" />
+    <Compile Include="AlignmentInputSmoke.cs" />
+    <Compile Include="../GH.DatasetPorts.cs" />
+    <Compile Include="../GH.ComponentIcons.cs" />
+    <Compile Include="..\GH.ColmapModelAlignmentComponent.cs" Link="ColmapModelAlignmentComponent.cs" />
+    <ProjectReference Include="..\RhinoSplat.Core.csproj" />
+    <Reference Include="RhinoCommon"><HintPath>C:\Program Files\Rhino 8\System\netcore\RhinoCommon.dll</HintPath></Reference>
+    <Reference Include="Grasshopper"><HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\Grasshopper.dll</HintPath></Reference>
+    <Reference Include="GH_IO"><HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\GH_IO.dll</HintPath></Reference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AssemblyName>Splatypus</AssemblyName>
+    <TargetExt>.gha</TargetExt>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <Import Project="RhinoSplat.Sdk.props" />
+  <ItemGroup>
+    <Compile Include="GH.*.cs" />
+    <EmbeddedResource Include="Assets/Icons-Splatypus/png24/*.png" LogicalName="RhinoSplat.Icons.%(Filename)%(Extension)" />
+    <ProjectReference Include="RhinoSplat.Core.csproj" />
+  </ItemGroup>
+</Project>

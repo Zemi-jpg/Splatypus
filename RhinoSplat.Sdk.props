@@ -1,0 +1,9 @@
+<Project>
+  <!-- Pin the distribution SDK so updating the build machine's Rhino installation
+       cannot silently raise the minimum Grasshopper version on other devices. -->
+  <ItemGroup>
+    <PackageReference Include="Grasshopper" Version="[8.34.26223.11001]" ExcludeAssets="runtime" PrivateAssets="all" />
+    <PackageReference Include="RhinoCommon" Version="[8.34.26223.11001]" ExcludeAssets="runtime" PrivateAssets="all" />
+    <PackageReference Include="System.Drawing.Common" Version="[8.0.0]" ExcludeAssets="runtime" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

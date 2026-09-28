@@ -1,0 +1,170 @@
+[
+  {
+    "id": "hello-splat",
+    "label": "Hello Splat",
+    "category": "01 / SETUP",
+    "svg": "svg/hello-splat.svg",
+    "png": "png24/hello-splat.png",
+    "motif": "Head + bill + paddle tail"
+  },
+  {
+    "id": "project",
+    "label": "RS Project",
+    "category": "01 / SETUP",
+    "svg": "svg/project.svg",
+    "png": "png24/project.png",
+    "motif": "Folder folds into a flattened bill"
+  },
+  {
+    "id": "download-tools",
+    "label": "RS Download Tools",
+    "category": "01 / SETUP",
+    "svg": "svg/download-tools.svg",
+    "png": "png24/download-tools.png",
+    "motif": "Webbed foot becomes a receiving tray"
+  },
+  {
+    "id": "ffmpeg-setup",
+    "label": "RS FFmpeg Setup",
+    "category": "02 / DATASET",
+    "svg": "svg/ffmpeg-setup.svg",
+    "png": "png24/ffmpeg-setup.png",
+    "motif": "FFmpeg ribbon ends in a green bill"
+  },
+  {
+    "id": "media-import",
+    "label": "RS Media Import",
+    "category": "02 / DATASET",
+    "svg": "svg/media-import.svg",
+    "png": "png24/media-import.png",
+    "motif": "Film frame with a bill-shaped exit"
+  },
+  {
+    "id": "colmap-setup",
+    "label": "RS COLMAP Setup",
+    "category": "03 / COLMAP",
+    "svg": "svg/colmap-setup.svg",
+    "png": "png24/colmap-setup.png",
+    "motif": "COLMAP aperture acquires a red bill"
+  },
+  {
+    "id": "feature-extract",
+    "label": "RS COLMAP Feature Extract",
+    "category": "03 / COLMAP",
+    "svg": "svg/feature-extract.svg",
+    "png": "png24/feature-extract.png",
+    "motif": "Detected features on a paddle-tail outline"
+  },
+  {
+    "id": "exhaustive-match",
+    "label": "RS COLMAP Exhaustive Match",
+    "category": "03 / COLMAP",
+    "svg": "svg/exhaustive-match.svg",
+    "png": "png24/exhaustive-match.png",
+    "motif": "Matching across two bill profiles"
+  },
+  {
+    "id": "sparse-reconstruct",
+    "label": "RS COLMAP Sparse Reconstruct",
+    "category": "03 / COLMAP",
+    "svg": "svg/sparse-reconstruct.svg",
+    "png": "png24/sparse-reconstruct.png",
+    "motif": "A webbed foot becomes a spatial graph"
+  },
+  {
+    "id": "undistort-images",
+    "label": "RS COLMAP Undistort Images",
+    "category": "03 / COLMAP",
+    "svg": "svg/undistort-images.svg",
+    "png": "png24/undistort-images.png",
+    "motif": "Curved paddle grid straightens into an image"
+  },
+  {
+    "id": "export-model",
+    "label": "RS COLMAP Export Model",
+    "category": "03 / COLMAP",
+    "svg": "svg/export-model.svg",
+    "png": "png24/export-model.png",
+    "motif": "Bill-shaped document with export arrow"
+  },
+  {
+    "id": "sparse-point-cloud",
+    "label": "RS Sparse Point Cloud",
+    "category": "04 / REALIGNMENT",
+    "svg": "svg/sparse-point-cloud.svg",
+    "png": "png24/sparse-point-cloud.png",
+    "motif": "A point cloud traces the paddle-tail silhouette"
+  },
+  {
+    "id": "camera-planes",
+    "label": "RS Camera Planes",
+    "category": "04 / REALIGNMENT",
+    "svg": "svg/camera-planes.svg",
+    "png": "png24/camera-planes.png",
+    "motif": "Camera frustums fan out like webbed toes"
+  },
+  {
+    "id": "geometry-translator",
+    "label": "RS Geometry Translator",
+    "category": "04 / REALIGNMENT",
+    "svg": "svg/geometry-translator.svg",
+    "png": "png24/geometry-translator.png",
+    "motif": "Paddle form with move axes"
+  },
+  {
+    "id": "align-model",
+    "label": "RS Align COLMAP Model",
+    "category": "04 / REALIGNMENT",
+    "svg": "svg/align-model.svg",
+    "png": "png24/align-model.png",
+    "motif": "Webbed landmark triangle inside alignment target"
+  },
+  {
+    "id": "training-dataset-check",
+    "label": "RS Training Dataset Check",
+    "category": "05 / TRAINING",
+    "svg": "svg/training-dataset-check.svg",
+    "png": "png24/training-dataset-check.png",
+    "motif": "Bill-shaped document with paired data and check"
+  },
+  {
+    "id": "brush-dataset",
+    "label": "RS Brush Dataset",
+    "category": "05 / TRAINING",
+    "svg": "svg/brush-dataset.svg",
+    "png": "png24/brush-dataset.png",
+    "motif": "Paddle brush over stacked bill-shaped pages"
+  },
+  {
+    "id": "brush-train",
+    "label": "RS Brush Train",
+    "category": "05 / TRAINING",
+    "svg": "svg/brush-train.svg",
+    "png": "png24/brush-train.png",
+    "motif": "The blue brush handle becomes a paddle tail"
+  },
+  {
+    "id": "splat-preview",
+    "label": "RS Splat Preview",
+    "category": "06 / PREVIEW",
+    "svg": "svg/splat-preview.svg",
+    "png": "png24/splat-preview.png",
+    "motif": "Splat-filled bill inside a viewing eye"
+  },
+  {
+    "id": "model-report",
+    "label": "RS COLMAP Model Report",
+    "category": "LEGACY / HIDDEN",
+    "svg": "svg/model-report.svg",
+    "png": "png24/model-report.png",
+    "motif": "Bar chart with a flattened bill baseline"
+  },
+  {
+    "id": "colmap-pipeline",
+    "label": "Splatypus COLMAP Pipeline",
+    "category": "03 / COLMAP",
+    "svg": "svg/colmap-pipeline.svg",
+    "png": "png24/colmap-pipeline.png",
+    "motif": "Front-facing platypus head formed from COLMAP aperture facets and a broad bill"
+  }
+]
