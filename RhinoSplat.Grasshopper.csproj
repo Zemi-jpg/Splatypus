@@ -11,9 +11,10 @@
   </PropertyGroup>
 
   <Import Project="RhinoSplat.Sdk.props" />
+  <Import Project="Publication/Splatypus.Release.props" />
   <ItemGroup>
-    <Compile Include="GH.*.cs" />
-    <EmbeddedResource Include="Assets/Icons-Splatypus/png24/*.png" LogicalName="RhinoSplat.Icons.%(Filename)%(Extension)" />
+    <Compile Include="GH.*.cs" Exclude="GH.ColmapMeshGeometry.cs;GH.ColmapMeshReconstructionComponent.cs" />
+    <EmbeddedResource Include="Assets/Icons-Splatypus/png24/*.png" Exclude="Assets/Icons-Splatypus/png24/mesh-reconstruct.png" LogicalName="RhinoSplat.Icons.%(Filename)%(Extension)" />
     <ProjectReference Include="RhinoSplat.Core.csproj" />
   </ItemGroup>
 </Project>

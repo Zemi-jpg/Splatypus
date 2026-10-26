@@ -9,9 +9,10 @@ foreach ($platform in @('windows', 'macos')) {
     $references = $assembly.GetReferencedAssemblies()
     if (@($references | Where-Object Name -EQ 'Splatypus.Core').Count -ne 1) { throw "$platform does not reference Splatypus.Core" }
     $iconFolder = Join-Path $PSScriptRoot '../Assets/Icons-Splatypus/png24'
-    $iconFiles = @(Get-ChildItem -LiteralPath $iconFolder -Filter '*.png')
+    $iconFiles = @(Get-ChildItem -LiteralPath $iconFolder -Filter '*.png' | Where-Object Name -NE 'mesh-reconstruct.png')
     $resources = @($assembly.GetManifestResourceNames())
-    if ($iconFiles.Count -ne 21 -or $resources.Count -ne 21) { throw "$platform must contain all 21 Splatypus icons" }
+    if ($iconFiles.Count -ne 21 -or $resources.Count -ne 21) { throw "$platform must contain all 21 current Splatypus icons" }
+    if ($resources -contains 'RhinoSplat.Icons.mesh-reconstruct.png') { throw "$platform embeds an excluded mesh icon" }
     foreach ($icon in $iconFiles) {
         $stream = $assembly.GetManifestResourceStream("RhinoSplat.Icons.$($icon.Name)")
         if ($null -eq $stream) { throw "$platform is missing icon $($icon.Name)" }
@@ -34,9 +35,8 @@ foreach ($platform in @('windows', 'macos')) {
     $zipName = if ($platform -eq 'windows') { 'Splatypus-Windows-workflow.zip' } else { 'Splatypus-macOS-workflow.zip' }
     $archive = [IO.Compression.ZipFile]::OpenRead((Join-Path (Resolve-Path -LiteralPath $DistributionFolder).Path $zipName))
     try {
-        $guide = if ($platform -eq 'windows') { 'README-Windows.md' } else { 'Mac-workflow.md' }
-        $expectedFiles = @('Splatypus.gha', 'Splatypus.Core.dll', $guide, 'Download-tools.md', 'Colmap-pipeline.md')
-        if ($archive.Entries.Count -ne $expectedFiles.Count) { throw "$zipName contains unexpected files" }
+        $expectedFiles = @('Splatypus.gha', 'Splatypus.Core.dll', 'README.md', 'LICENSE.txt', 'NOTICE.txt', 'Splatypus-Quick-Start.pdf', 'Examples/Splatypus_Workflow.gh')
+        if (@($archive.Entries | Where-Object { $_.Name.Length -gt 0 }).Count -ne $expectedFiles.Count) { throw "$zipName contains unexpected files" }
         foreach ($name in $expectedFiles) {
             $entry = $archive.GetEntry($name)
             if ($null -eq $entry) { throw "$zipName is missing $name" }

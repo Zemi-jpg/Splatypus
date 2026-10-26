@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <Version Condition="'$(Version)' == ''">0.1.0</Version>
+    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">0.1.0.0</AssemblyVersion>
+    <FileVersion Condition="'$(FileVersion)' == ''">0.1.0.0</FileVersion>
+    <InformationalVersion Condition="'$(InformationalVersion)' == ''">0.1.0</InformationalVersion>
+    <Company Condition="'$(Company)' == ''">Zeming Li</Company>
+    <SplatypusSupportContact Condition="'$(SplatypusSupportContact)' == ''">lizeming2021@gmail.com</SplatypusSupportContact>
+    <PackageProjectUrl>https://zeming.li/</PackageProjectUrl>
+    <Product>Splatypus</Product>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright Condition="'$(Copyright)' == ''">Copyright (c) 2026 Zeming Li</Copyright>
+    <Description>Photogrammetry and Gaussian splat training workflows for Grasshopper in Rhino 8.</Description>
+    <AssemblyTitle>$(AssemblyName)</AssemblyTitle>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
+    <DebugSymbols Condition="'$(Configuration)' == 'Release'">false</DebugSymbols>
+    <PathMap Condition="'$(Configuration)' == 'Release'">$(MSBuildProjectDirectory)=/_/src,$(RhinoSplatBuildRoot)=/_/build/$(MSBuildProjectName)/</PathMap>
+  </PropertyGroup>
+  <ItemGroup>
+    <AssemblyMetadata Include="SupportContact" Value="$(SplatypusSupportContact)" />
+    <AssemblyMetadata Include="License" Value="MIT" />
+    <AssemblyMetadata Include="Website" Value="$(PackageProjectUrl)" />
+  </ItemGroup>
+</Project>

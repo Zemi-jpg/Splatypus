@@ -203,11 +203,14 @@ internal sealed class DatasetColmapException(int exitCode, string message) : IOE
 
 internal static class DatasetColmapProcess
 {
-    public static async Task<string> Run(string executable, string logPath, CancellationToken token, params string[] args)
+    public static Task<string> Run(string executable, string logPath, CancellationToken token, params string[] args)
+        => RunInDirectory(executable, Path.GetDirectoryName(executable)!, logPath, token, args);
+
+    public static async Task<string> RunInDirectory(string executable, string workingDirectory, string logPath, CancellationToken token, params string[] args)
     {
         token.ThrowIfCancellationRequested();
-        var info = new ProcessStartInfo(executable) { WorkingDirectory = Path.GetDirectoryName(executable)!, RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false, CreateNoWindow = true };
-        info.Environment["PATH"] = info.WorkingDirectory + Path.PathSeparator + Environment.GetEnvironmentVariable("PATH");
+        var info = new ProcessStartInfo(executable) { WorkingDirectory = workingDirectory, RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false, CreateNoWindow = true };
+        info.Environment["PATH"] = Path.GetDirectoryName(executable) + Path.PathSeparator + Environment.GetEnvironmentVariable("PATH");
         foreach (var arg in args) info.ArgumentList.Add(arg);
         using var process = new Process { StartInfo = info };
         process.Start();

@@ -1,0 +1,14 @@
+{
+  "packageName": "Splatypus",
+  "version": "0.1.0",
+  "assemblyVersion": "0.1.0.0",
+  "author": "Zeming Li",
+  "copyrightHolder": "Zeming Li",
+  "copyrightYear": 2026,
+  "supportContact": "lizeming2021@gmail.com",
+  "website": "https://zeming.li/",
+  "licenseChoice": "MIT",
+  "identityAndRightsConfirmed": true,
+  "notes": "First public release. MIT License. Publication approved by the publisher on 2026-10-11.",
+  "publicationApproved": true
+}

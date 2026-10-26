@@ -13,3 +13,19 @@
 *.user
 *.suo
 *.log
+
+# Local caches, generated reviews and working material
+.dotnet-cli/
+outputs/
+tmp/
+
+# Keep only the versioned public release packages in Git.
+dist/*
+!dist/publication/
+
+# Local credentials and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.pfx

@@ -1,0 +1,29 @@
+{
+  "package": "Splatypus",
+  "version": "0.1.0",
+  "author": "Zeming Li",
+  "copyrightHolder": "Zeming Li",
+  "license": "MIT",
+  "support": "lizeming2021@gmail.com",
+  "website": "https://zeming.li/",
+  "minimumRhinoSdk": "8.34.26223.11001",
+  "runtime": ".NET 8",
+  "artifacts": [
+    {
+      "platform": "windows",
+      "yak": "splatypus-0.1.0-rh8_34-win.yak",
+      "zip": "Splatypus-0.1.0-windows.zip",
+      "assemblyVersion": "0.1.0.0",
+      "tag": "rh8_34-win"
+    },
+    {
+      "platform": "macos",
+      "yak": "splatypus-0.1.0-rh8_34-mac.yak",
+      "zip": "Splatypus-0.1.0-macos.zip",
+      "assemblyVersion": "0.1.0.0",
+      "tag": "rh8_34-mac"
+    }
+  ],
+  "externalToolBinariesBundled": false,
+  "hostSdkBinariesBundled": false
+}

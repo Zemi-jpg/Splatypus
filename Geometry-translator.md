@@ -12,4 +12,4 @@ The regression harness checks the moved pivot, degree conventions, rotation orde
 
 Validation: all 15 native geometry checks passed inside Rhino on 2026-09-15. The plugin builds without warnings or errors. The toolbar inventory has 19 components across the six groups, including the retained COLMAP Model Report. Test output is packaged as `test-report.txt`.
 
-Close Rhino before installation, then run `powershell -NoProfile -ExecutionPolicy Bypass -File C:\Users\basar\RhinoSplatDev\Install-GeometryTranslator.ps1`. The script backs up the previous plugin files and verifies both installed files. Restart Rhino to see the new component and toolbar groups.
+Close Rhino before installation, open PowerShell in the source checkout, then run `powershell -NoProfile -ExecutionPolicy Bypass -File .\Install-GeometryTranslator.ps1`. The script backs up the previous plugin files and verifies both installed files. Restart Rhino to see the new component and toolbar groups.

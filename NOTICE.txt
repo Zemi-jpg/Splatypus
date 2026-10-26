@@ -1,0 +1,7 @@
+Splatypus
+Copyright (c) 2026 Zeming Li
+Licensed under the MIT License; see LICENSE.txt.
+Third-party tools, host software and trademarks are separately licensed; see README.md, Licenses and credits.
+Author: Zeming Li
+Support: lizeming2021@gmail.com
+Website: https://zeming.li/

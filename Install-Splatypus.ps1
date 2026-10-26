@@ -1,9 +1,10 @@
+param([string]$SourceFolder = (Join-Path $PSScriptRoot 'dist\windows'))
+
 $ErrorActionPreference = 'Stop'
 if (Get-Process -Name Rhino -ErrorAction SilentlyContinue) {
     throw 'Close Rhino before installing Splatypus.'
 }
 
-$sourceFolder = Join-Path $PSScriptRoot 'dist\windows'
 $fileNames = @('Splatypus.gha', 'Splatypus.Core.dll')
 foreach ($file in $fileNames) {
     if (-not (Test-Path -LiteralPath (Join-Path $sourceFolder $file) -PathType Leaf)) {

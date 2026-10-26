@@ -1,0 +1,107 @@
+[
+  {
+    "id": "hello-splat",
+    "name": "SP Hello",
+    "category": "01 Setup"
+  },
+  {
+    "id": "project",
+    "name": "SP Project",
+    "category": "01 Setup"
+  },
+  {
+    "id": "download-tools",
+    "name": "SP Download Tools",
+    "category": "01 Setup"
+  },
+  {
+    "id": "ffmpeg-setup",
+    "name": "SP FFmpeg Setup",
+    "category": "02 dataset"
+  },
+  {
+    "id": "media-import",
+    "name": "SP Media Import",
+    "category": "02 dataset"
+  },
+  {
+    "id": "colmap-setup",
+    "name": "SP COLMAP Setup",
+    "category": "03 COLMAP"
+  },
+  {
+    "id": "feature-extract",
+    "name": "SP COLMAP Feature Extract",
+    "category": "03 COLMAP"
+  },
+  {
+    "id": "exhaustive-match",
+    "name": "SP COLMAP Exhaustive Match",
+    "category": "03 COLMAP"
+  },
+  {
+    "id": "sparse-reconstruct",
+    "name": "SP COLMAP Sparse Reconstruct",
+    "category": "03 COLMAP"
+  },
+  {
+    "id": "undistort-images",
+    "name": "SP COLMAP Undistort Images",
+    "category": "03 COLMAP"
+  },
+  {
+    "id": "export-model",
+    "name": "SP COLMAP Export Model",
+    "category": "03 COLMAP"
+  },
+  {
+    "id": "sparse-point-cloud",
+    "name": "SP Sparse Point Cloud",
+    "category": "04 Realignment"
+  },
+  {
+    "id": "camera-planes",
+    "name": "SP Camera Planes",
+    "category": "04 Realignment"
+  },
+  {
+    "id": "geometry-translator",
+    "name": "SP Geometry Translator",
+    "category": "04 Realignment"
+  },
+  {
+    "id": "align-model",
+    "name": "SP Align COLMAP Model",
+    "category": "04 Realignment"
+  },
+  {
+    "id": "training-dataset-check",
+    "name": "SP Active Dataset",
+    "category": "05 Training"
+  },
+  {
+    "id": "brush-dataset",
+    "name": "SP Brush Dataset",
+    "category": "05 Training"
+  },
+  {
+    "id": "brush-train",
+    "name": "SP Brush Train",
+    "category": "05 Training"
+  },
+  {
+    "id": "splat-preview",
+    "name": "SP Splat Preview",
+    "category": "06 Preview"
+  },
+  {
+    "id": "model-report",
+    "name": "SP COLMAP Model Report",
+    "category": "03 COLMAP"
+  },
+  {
+    "id": "colmap-pipeline",
+    "name": "SP COLMAP Pipeline",
+    "category": "03 COLMAP"
+  }
+]
