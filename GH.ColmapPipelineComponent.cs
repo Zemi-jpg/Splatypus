@@ -44,13 +44,16 @@ public sealed class ColmapPipelineComponent : SpComponent
     internal void MigrateDatasetPorts()
     {
         _resetLegacyRun |= DatasetPorts.SingleDatasetOutput(this, "Database", "Sparse Model Folder", "Undistorted Workspace", "Text Model Folder");
+        EnsureSettings();
     }
 
     public override bool Read(GH_IO.Serialization.GH_IReader reader)
     {
         DatasetPorts.RestoreSavedLayout(this, reader);
         _resetLegacyRun = true;
-        return base.Read(reader);
+        var result = base.Read(reader);
+        EnsureSettings();
+        return result;
     }
     protected override void RegisterInputParams(GH_InputParamManager p)
     {
@@ -60,12 +63,23 @@ public sealed class ColmapPipelineComponent : SpComponent
         p.AddBooleanParameter("Replace Existing", "Replace", "Allow sparse reconstruction to replace the active model. Optional undistortion always updates the active pair after success.", GH_ParamAccess.item, false);
         p.AddBooleanParameter("Show Terminal", "Terminal", "Open one terminal showing live output from all selected COLMAP stages.", GH_ParamAccess.item, false);
         p.AddBooleanParameter("Extract Features", "Extract", "Run feature extraction. Disable to reuse an existing database.", GH_ParamAccess.item, true);
-        p.AddBooleanParameter("Match Features", "Match", "Run exhaustive matching. Disable to reuse existing matches.", GH_ParamAccess.item, true);
+        p.AddBooleanParameter("Match Features", "Match", "Run the selected matching method. Disable to reuse existing matches.", GH_ParamAccess.item, true);
         p.AddBooleanParameter("Reconstruct Sparse", "Sparse", "Run sparse reconstruction. Disable to reuse sparse model 0.", GH_ParamAccess.item, true);
         p.AddBooleanParameter("Undistort Images", "Undistort", "Optionally overwrite the active images and cameras with an undistorted pair.", GH_ParamAccess.item, false);
         p.AddBooleanParameter("Export Text Model", "Export", "Refresh the active model text view for geometry previews.", GH_ParamAccess.item, true);
         p.AddBooleanParameter("Show Progress", "Progress", "Publish stage progress while running. Completion is always published.", GH_ParamAccess.item, true);
         p.AddBooleanParameter("Cancel", "Cancel", "Stop the current process and skip later stages. A Button is recommended.", GH_ParamAccess.item, false);
+        p.AddIntegerParameter("Matching Method", "Matching", MatchingDescription, GH_ParamAccess.item, 0);
+        p.AddIntegerParameter("Extraction Max Image Size", "Extract Size", "Longest side used for feature extraction. Default 3200. Changing extraction settings rebuilds the feature database.", GH_ParamAccess.item, 3200);
+        p.AddIntegerParameter("Maximum Features", "Features", "Maximum SIFT features per image. Default 8192. Changing extraction settings rebuilds the feature database.", GH_ParamAccess.item, 8192);
+    }
+
+    internal const string MatchingDescription = "0 = Exhaustive (default); 1 = Sequential (ordered video); 2 = Spatial (positions required for every image); 3 = Auto (complete positions, then a confirmed single video, otherwise exhaustive). Video telemetry is not automatically transferred to frames.";
+    private void EnsureSettings()
+    {
+        DatasetPorts.EnsureIntegerInput(this, "Matching Method", "Matching", MatchingDescription, 0);
+        DatasetPorts.EnsureIntegerInput(this, "Extraction Max Image Size", "Extract Size", "Longest side for feature extraction. Default 3200. Changed settings rebuild the feature database.", 3200);
+        DatasetPorts.EnsureIntegerInput(this, "Maximum Features", "Features", "Maximum features per image. Default 8192. Changed settings rebuild the feature database.", 8192);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager p)
@@ -98,6 +112,8 @@ public sealed class ColmapPipelineComponent : SpComponent
         da.GetData(3, ref replace); da.GetData(4, ref terminal); da.GetData(5, ref extract);
         da.GetData(6, ref match); da.GetData(7, ref sparse); da.GetData(8, ref undistort);
         da.GetData(9, ref export); da.GetData(10, ref progress); da.GetData(11, ref cancel);
+        var matching = 0; var imageSize = 3200; var features = 8192;
+        da.GetData(12, ref matching); da.GetData(13, ref imageSize); da.GetData(14, ref features);
         if (_resetLegacyRun)
         {
             if (!run) _resetLegacyRun = false;
@@ -108,7 +124,8 @@ public sealed class ColmapPipelineComponent : SpComponent
             if (!run) _runMustReset.Remove(da.Iteration);
             run = false;
         }
-        var state = session.Update(new(exe, root, extract, match, sparse, undistort, export, replace, terminal), run, cancel, progress);
+        var state = session.Update(new(exe, root, extract, match, sparse, undistort, export, replace, terminal,
+            (ColmapMatchingMode)matching, imageSize, features), run, cancel, progress);
         if (state.IsRunning)
         {
             Message = state.IsCancelling ? "Cancelling…" : progress && state.Progress is { } step ? step.Stage : "Running…";

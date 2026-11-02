@@ -6,6 +6,14 @@ namespace RhinoSplat.Grasshopper;
 
 internal static class DatasetPorts
 {
+    public static void EnsureIntegerInput(GH_Component component, string name, string nickname, string description, int value)
+    {
+        if (component.Params.Input.Any(p => p.Name == name)) return;
+        var parameter = new Param_Integer { Name = name, NickName = nickname, Description = description, Access = GH_ParamAccess.item };
+        parameter.SetPersistentData(value);
+        component.Params.RegisterInputParam(parameter);
+        component.Params.OnParametersChanged();
+    }
     // Fixed Grasshopper components otherwise read only their new port counts, truncating
     // later legacy controls or reading transform data into a text/boolean parameter.
     public static void RestoreSavedLayout(GH_Component component, GH_IReader reader)

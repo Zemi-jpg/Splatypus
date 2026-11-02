@@ -71,8 +71,39 @@ Test(() => new ColmapModelExportComponent(), c => {
 Test(() => new ColmapSparseMapperComponent(), c => LegacyOutputs(c, "Sparse Model Folder"),
     new[] { "COLMAP Executable", "Project Root", "Run", "Replace Existing", "Show Terminal" }, new[] { "Active Dataset", "Exit Code", "Log", "Status" });
 Test(() => new ColmapPipelineComponent(), c => LegacyOutputs(c, "Database", "Sparse Model Folder", "Undistorted Workspace", "Text Model Folder"),
-    new[] { "COLMAP Executable", "Project Root", "Run", "Replace Existing", "Show Terminal", "Extract Features", "Match Features", "Reconstruct Sparse", "Undistort Images", "Export Text Model", "Show Progress", "Cancel" },
+    new[] { "COLMAP Executable", "Project Root", "Run", "Replace Existing", "Show Terminal", "Extract Features", "Match Features", "Reconstruct Sparse", "Undistort Images", "Export Text Model", "Show Progress", "Cancel", "Matching Method", "Extraction Max Image Size", "Maximum Features" },
     new[] { "Active Dataset", "Exit Code", "Log", "Status", "Progress" });
 Test(() => new TrainingDatasetCheckComponent(), c => LegacyOutputs(c, "Images", "Sparse Model", "Text Model", "Manifest"),
     new[] { "Project Root", "Update" }, new[] { "Active Dataset", "Valid", "Source Images", "Registered Images", "Sparse Points", "Status" });
 Console.WriteLine($"{passed} component serialization/migration checks passed.");
+
+void Appended(Func<GH_Component> make, int oldCount, string[] settings)
+{
+    var old = make(); old.CreateAttributes();
+    while (old.Params.Input.Count > oldCount) old.Params.UnregisterInputParameter(old.Params.Input[^1], true);
+    var oldParameters = old.Params.Input.Select(p => (p.Name, p.GetType())).ToArray();
+    ((Param_String)old.Params.Input[0]).SetPersistentData("original executable path");
+    var saved = new GH_LooseChunk("legacy"); old.Write(saved);
+    var restored = make(); restored.CreateAttributes();
+    Check(restored.Read(saved), restored.Name + " reads a 0.1.0 component with fewer settings.");
+    Check(restored.Params.Input.Take(oldCount).Select(p => (p.Name, p.GetType())).SequenceEqual(oldParameters), "Original socket order and types are preserved for " + restored.Name);
+    Check(restored.Params.Input.Skip(oldCount).Select(p => p.Name).SequenceEqual(settings), "New optional settings are appended to " + restored.Name);
+    Check(((Param_String)restored.Params.Input[0]).PersistentData.AllData(true).Cast<GH_String>().Single().Value == "original executable path", "Old persistent values survive in " + restored.Name);
+    foreach (var param in restored.Params.Input.Skip(oldCount))
+    {
+        if (param is Param_Integer integer) { integer.PersistentData.Clear(); integer.SetPersistentData(123); }
+        if (param is Param_Boolean boolean) { boolean.PersistentData.Clear(); boolean.SetPersistentData(true); }
+    }
+    var currentArchive = new GH_LooseChunk("current"); restored.Write(currentArchive);
+    var current = make(); current.CreateAttributes(); current.Read(currentArchive);
+    Check(current.Params.Input.Select(p => (p.Name, p.GetType())).SequenceEqual(restored.Params.Input.Select(p => (p.Name, p.GetType()))), "Updated settings roundtrip without duplicate sockets for " + restored.Name);
+    Check(current.Params.Input.Skip(oldCount).OfType<Param_Integer>().All(p => ((GH_Integer)p.PersistentData.AllData(true).Single()).Value == 123)
+        && current.Params.Input.Skip(oldCount).OfType<Param_Boolean>().All(p => ((GH_Boolean)p.PersistentData.AllData(true).Single()).Value), "Edited optional values survive reopening for " + restored.Name);
+    Check(current.ComponentGuid == old.ComponentGuid, "Component identity remains stable for " + restored.Name);
+}
+Appended(() => new FFmpegMediaImportComponent(), 8, new[] { "Image Format", "Skip Near Duplicates" });
+Appended(() => new BrushTrainingComponent(), 11, new[] { "Maximum Training Resolution", "Maximum Splat Count" });
+Appended(() => new ColmapFeatureExtractionComponent(), 4, new[] { "Extraction Max Image Size", "Maximum Features" });
+Appended(() => new ColmapExhaustiveMatchingComponent(), 4, new[] { "Matching Method" });
+Appended(() => new ColmapPipelineComponent(), 12, new[] { "Matching Method", "Extraction Max Image Size", "Maximum Features" });
+Console.WriteLine($"{passed} total component migration checks passed.");

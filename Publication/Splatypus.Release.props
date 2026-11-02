@@ -1,10 +1,10 @@
 <Project>
   <PropertyGroup>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-    <Version Condition="'$(Version)' == ''">0.1.0</Version>
-    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">0.1.0.0</AssemblyVersion>
-    <FileVersion Condition="'$(FileVersion)' == ''">0.1.0.0</FileVersion>
-    <InformationalVersion Condition="'$(InformationalVersion)' == ''">0.1.0</InformationalVersion>
+    <Version Condition="'$(Version)' == ''">0.2.0</Version>
+    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">0.2.0.0</AssemblyVersion>
+    <FileVersion Condition="'$(FileVersion)' == ''">0.2.0.0</FileVersion>
+    <InformationalVersion Condition="'$(InformationalVersion)' == ''">0.2.0</InformationalVersion>
     <Company Condition="'$(Company)' == ''">Zeming Li</Company>
     <SplatypusSupportContact Condition="'$(SplatypusSupportContact)' == ''">lizeming2021@gmail.com</SplatypusSupportContact>
     <PackageProjectUrl>https://zeming.li/</PackageProjectUrl>

@@ -72,7 +72,7 @@ public sealed class ColmapImageUndistorterComponent : SpTaskCapableComponent<Col
         da.SetData(2, latest.Log); da.SetData(3, latest.Status);
     }
 
-    public override GH_Exposure Exposure => GH_Exposure.quinary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
 
     public override Guid ComponentGuid => new("F00F5CD2-7CC2-4B0D-8F79-469BB8D4A769");
 }

@@ -1,7 +1,7 @@
 {
   "packageName": "Splatypus",
-  "version": "0.1.0",
-  "assemblyVersion": "0.1.0.0",
+  "version": "0.2.0",
+  "assemblyVersion": "0.2.0.0",
   "author": "Zeming Li",
   "copyrightHolder": "Zeming Li",
   "copyrightYear": 2026,
@@ -9,6 +9,6 @@
   "website": "https://zeming.li/",
   "licenseChoice": "MIT",
   "identityAndRightsConfirmed": true,
-  "notes": "First public release. MIT License. Publication approved by the publisher on 2026-10-11.",
+  "notes": "0.2.0 package and public GitHub source/release publication authorized by publisher on 2026-11-02. Includes SP_020 working template. Publisher will upload the Food4Rhino ZIPs manually.",
   "publicationApproved": true
 }

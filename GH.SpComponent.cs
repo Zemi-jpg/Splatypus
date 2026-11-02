@@ -4,6 +4,28 @@ using System.Text.RegularExpressions;
 
 namespace RhinoSplat.Grasshopper;
 
+internal static class AppendedInputs
+{
+    // Let Grasshopper deserialize exactly the saved socket count, then append new defaults.
+    // Existing wires and persistent values retain their original indices.
+    public static IGH_Param[] BeforeRead(GH_Component component, GH_IReader reader, params string[] names)
+    {
+        var additions = component.Params.Input.Where(p => names.Contains(p.Name)).ToArray();
+        if (!reader.ChunkExists("param_input", 0)) return Array.Empty<IGH_Param>();
+        var savedNames = new HashSet<string>();
+        for (var i = 0; reader.FindChunk("param_input", i) is { } chunk; i++) savedNames.Add(chunk.GetString("Name"));
+        var missing = additions.Where(p => !savedNames.Contains(p.Name)).ToArray();
+        foreach (var parameter in missing) component.Params.UnregisterInputParameter(parameter, true);
+        component.Params.OnParametersChanged();
+        return missing;
+    }
+    public static void AfterRead(GH_Component component, IEnumerable<IGH_Param> missing)
+    {
+        foreach (var parameter in missing) component.Params.RegisterInputParam(parameter);
+        component.Params.OnParametersChanged();
+    }
+}
+
 // Refresh saved display metadata as well as newly placed/searchable components.
 internal static class SpBranding
 {

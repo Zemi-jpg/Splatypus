@@ -85,8 +85,9 @@ try {
         $authorYaml = ConvertTo-Json -InputObject ([string]$config.author) -Compress
         $manifest = @('name: Splatypus', "version: $($config.version)", 'authors:', "  - $authorYaml",
             'description: >', '  Photogrammetry and Gaussian splat training workflows for Grasshopper in Rhino 8.34+',
-            '  with .NET 8. Connect FFmpeg media import, COLMAP reconstruction, alignment and',
-            '  Brush training. Includes colored point-cloud preview.',
+            '  with .NET 8. Connect FFmpeg import, COLMAP reconstruction, three-point alignment',
+            '  and Brush training. Includes camera playback, calibrated Rhino scene capture,',
+            '  automatic backgrounds and colored point-cloud preview.',
             '  External tools are installed separately. A Gaussian splat renderer is not included.')
         $manifest += 'icon: icon.png'
         if ($config.website) { $manifest += ('url: ' + (ConvertTo-Json -InputObject ([string]$config.website) -Compress)) }
@@ -116,6 +117,8 @@ try {
     $inventory = [ordered]@{ package = $config.packageName; version = $config.version; author = $config.author;
         copyrightHolder = $config.copyrightHolder; license = $config.licenseChoice; support = $config.supportContact; website = $config.website;
         minimumRhinoSdk = '8.34.26223.11001'; runtime = '.NET 8';
+        example = [ordered]@{ path = 'Examples/Splatypus_Workflow.gh'; source = 'SP_020';
+            sha256 = (Get-FileHash -LiteralPath (Join-Path $root 'Examples/Splatypus_Workflow.gh') -Algorithm SHA256).Hash.ToLowerInvariant() };
         artifacts = @($records); externalToolBinariesBundled = $false; hostSdkBinariesBundled = $false }
     Set-Content -LiteralPath (Join-Path $destination 'release-inventory.json') -Value ($inventory | ConvertTo-Json -Depth 6) -Encoding utf8
     & (Join-Path $PSScriptRoot 'Verify-Release.ps1') -ReleaseFolder $destination

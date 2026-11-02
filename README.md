@@ -2,92 +2,104 @@
 
 **Photogrammetry and Gaussian splat training workflows for Grasshopper in Rhino 8.**
 
-[food4Rhino](https://www.food4rhino.com/en/app/splatypus) · [Download 0.1.0](#download-and-install) · [Quick-start PDF](Publication/Splatypus-Quick-Start.pdf) · [Example workflow](Examples/Splatypus_Workflow.gh) · [User guide](Documentation/User-guide.md)
+[food4Rhino](https://www.food4rhino.com/en/app/splatypus) · [Download 0.2.0](#download-and-install) · [All releases](https://github.com/Zemi-jpg/Splatypus/releases) · [User guide](Documentation/User-guide.md) · [Quick-start PDF](Publication/Splatypus-Quick-Start.pdf)
 
 ![Splatypus connects media, reconstruction, training and inspection in Grasshopper](Publication/assets/splatypus-hero-1600x900.png)
 
-Splatypus brings photographs and video into a connected, local reconstruction and training workflow. It connects **FFmpeg** media import, **COLMAP** camera reconstruction and **Brush** Gaussian splat training through a shared project folder, with progress, logs and cancellation inside Grasshopper.
+Splatypus connects **FFmpeg** media import, **COLMAP** camera reconstruction and **Brush** Gaussian splat training through a shared local project, with progress, logs and cancellation inside Grasshopper. Inspect and align reconstructions, replay video camera tracks, or capture a Rhino scene with design geometry for retraining.
 
-Developed by **[Zeming Li](https://zeming.li/)**. Free under the **[MIT License](LICENSE.txt)**. Current release: **0.1.0**, published on food4Rhino on **11 October 2026**.
+Developed by **[Zeming Li](https://zeming.li/)**. Free under the **[MIT License](LICENSE.txt)**. Latest version: **[0.2.0](https://github.com/Zemi-jpg/Splatypus/releases/tag/v0.2.0)**. The original **[0.1.0](https://github.com/Zemi-jpg/Splatypus/releases/tag/v0.1.0)** release remains available with its original source tag and installers.
 
-## What you can do
+## What's new in 0.2.0
 
-- Import photographs or extract video frames, with image-count estimates.
-- Reconstruct cameras and sparse points using individual COLMAP stages or one pipeline.
-- Undistort images, inspect camera planes and align a model to Rhino coordinates.
-- Prepare a consistent active dataset for Brush, train in the background and export PLY files.
-- Inspect exported point centers as colored point clouds in Rhino.
+- **Quick Align:** align a reconstruction to Rhino geometry with three point pairs, then refine or reset it.
+- **Video Frames and Video Playback:** group extracted frames by source video and animate the Rhino camera, with seeking, speed, looping and smoothing.
+- **View Capture:** capture the visible Rhino scene from known camera frames and prepare calibrated images for Brush without reconstructing cameras again.
+- **Auto Background:** estimate and preview a solid or gradient backdrop from splat colors.
+- **Import and processing controls:** JPEG/PNG import, near-duplicate video frame filtering, COLMAP matching choices, feature extraction limits and Brush training limits.
+- **Alignment handoff:** combine Quick Align and Geometry Translator adjustments in one saved camera-model alignment.
 
-The release contains **21 components**. Its Rhino preview displays colored points; a Gaussian splat viewport renderer, mesh reconstruction and texture-atlas generation are not included in 0.1.0.
+See the [short update log](Publication/Update-log-0.2.0.md) and [changelog](CHANGELOG.md).
 
 ## Download and install
 
-| Platform | Manual installation | Local Yak package |
-| --- | --- | --- |
-| Windows x64 | [Download ZIP](https://github.com/Zemi-jpg/Splatypus/raw/refs/tags/v0.1.0/dist/publication/Splatypus-0.1.0-windows.zip) | [Download Yak](https://github.com/Zemi-jpg/Splatypus/raw/refs/tags/v0.1.0/dist/publication/splatypus-0.1.0-rh8_34-win.yak) |
-| macOS | [Download ZIP](https://github.com/Zemi-jpg/Splatypus/raw/refs/tags/v0.1.0/dist/publication/Splatypus-0.1.0-macos.zip) | [Download Yak](https://github.com/Zemi-jpg/Splatypus/raw/refs/tags/v0.1.0/dist/publication/splatypus-0.1.0-rh8_34-mac.yak) |
+| Version | Platform | Manual ZIP | Local Yak package |
+| --- | --- | --- | --- |
+| **0.2.0 - latest** | Windows x64 | [Download ZIP](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.2.0/Splatypus-0.2.0-windows.zip) | [Download Yak](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.2.0/splatypus-0.2.0-rh8_34-win.yak) |
+| **0.2.0 - latest** | macOS | [Download ZIP](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.2.0/Splatypus-0.2.0-macos.zip) | [Download Yak](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.2.0/splatypus-0.2.0-rh8_34-mac.yak) |
+| 0.1.0 | Windows x64 | [Download ZIP](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.1.0/Splatypus-0.1.0-windows.zip) | [Download Yak](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.1.0/splatypus-0.1.0-rh8_34-win.yak) |
+| 0.1.0 | macOS | [Download ZIP](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.1.0/Splatypus-0.1.0-macos.zip) | [Download Yak](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.1.0/splatypus-0.1.0-rh8_34-mac.yak) |
 
-Downloads are also available on **[food4Rhino](https://www.food4rhino.com/en/app/splatypus)**. [SHA-256 checksums](dist/publication/SHA256SUMS.txt) identify the packaged files. Each package includes the plugin and Core library, the complete manual, quick-start PDF and Grasshopper example.
+Each release has its own **SHA256SUMS.txt**: [0.2.0 checksums](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.2.0/SHA256SUMS.txt), [0.1.0 checksums](https://github.com/Zemi-jpg/Splatypus/releases/download/v0.1.0/SHA256SUMS.txt). Each installer includes the matched plugin and Core library, complete README manual, quick-start PDF and `Examples/Splatypus_Workflow.gh`. Version 0.2.0 includes the SP_020 working template, using the same package layout as 0.1.0.
 
-**Package Manager:** in Rhino, run `_PackageManager`, search **Splatypus**, install and restart Rhino. If the package is unavailable in your catalog, use the manual ZIP or local Yak package above.
+**Manual ZIP:** extract the archive for your platform. In Grasshopper, open **File → Special Folders → Components Folder**, close Rhino, and copy the extracted contents into a `Splatypus` subfolder. Keep **Splatypus.gha** and **Splatypus.Core.dll** together. Restart Rhino, place **SP Hello**, and check that Status reports `SP is loaded: Ready`. Keep one installed copy and save your working definitions outside the installation folder.
 
-**Manual installation:** extract the ZIP for your platform. Open Grasshopper's **File → Special Folders → Components Folder**, close Rhino, and copy the extracted files into a `Splatypus` subfolder. Keep **Splatypus.gha** and **Splatypus.Core.dll** together. Restart Rhino, place **SP Hello**, and check that Status reports `SP is loaded: Ready`. Keep one installed copy.
-
-See the [installation guide](Documentation/Installation.md) for local Yak installation, platform details and upgrading from development builds.
+**Local Yak:** install the matching downloaded package using Rhino's Yak CLI, then restart Rhino. These GitHub downloads do not by themselves register a package in the public Rhino Package Manager catalog. See [installation](Documentation/Installation.md).
 
 ## Requirements
 
 | Requirement | Details |
 | --- | --- |
-| Rhino | Rhino **8.34.26223.11001 or newer**, Grasshopper and **.NET 8** |
+| Rhino | **8.34.26223.11001 or newer**, Grasshopper and **.NET 8** |
 | Windows | x64; primary release target |
-| macOS | Separate package; automatic tool installation supports **Apple Silicon** |
+| macOS | Separate build; automatic tool installation supports **Apple Silicon** |
 | External tools | FFmpeg with ffprobe, COLMAP and Brush, installed separately |
-| Training | A compatible GPU for Brush; CPU COLMAP does not make Brush a CPU trainer |
+| Training | Compatible GPU for Brush; CPU COLMAP does not make Brush a CPU trainer |
 
-Rhino 7 and .NET Framework mode are unsupported. Intel Mac and Windows ARM automatic tool installation are unsupported; the separate native applications have their own requirements. Automated package checks do not substitute for native Rhino workflow testing on each platform.
+Rhino 7 and .NET Framework mode are unsupported. Automatic tool installation does not support Intel Mac or Windows ARM. Both release targets compile and the archives are verified; native macOS testing of the new interactive workflows remains outstanding. See the [validation report](Publication/Validation-report.md) for test scope.
 
-## From media to a trained scene
+Splat Preview displays colored point centers. A Gaussian splat viewport renderer, mesh reconstruction and texture-atlas generation are not included in the installable packages. Experimental mesh source is retained in the repository and excluded from release builds.
 
-![Six-stage Splatypus workflow with optional undistortion and alignment](Publication/assets/splatypus-workflow-1600x900.png)
+## First workflow
 
-1. **Set up:** create a project with SP Project; install or locate the external tools.
-2. **Import:** choose photographs or video and run SP Media Import.
-3. **Reconstruct:** run SP COLMAP Pipeline, or use the individual reconstruction stages.
-4. **Prepare:** inspect cameras and sparse points; optionally undistort or align. Pass the active dataset to SP Brush Dataset.
-5. **Train:** prepare the dataset and start SP Brush Train. Follow progress and logs, then export a PLY.
-6. **Inspect:** open the exported PLY with SP Splat Preview as a colored point cloud.
+![Splatypus media-to-training workflow with optional undistortion and alignment](Publication/assets/splatypus-workflow-1600x900.png)
 
-Start with [Examples/Splatypus_Workflow.gh](Examples/Splatypus_Workflow.gh). Disable the solver while setting your own project folder, input media and tool paths, then run each stage deliberately. Save a working copy outside the plugin installation folder. See the [example notes](Examples/README.md) and [user guide](Documentation/User-guide.md) for the alignment and dataset connections.
+1. **Set up:** create a project with SP Project and install or locate external tools.
+2. **Import:** run SP Media Import on photographs or video; inspect the extracted images.
+3. **Reconstruct:** run SP COLMAP Pipeline or the individual stages.
+4. **Align:** inspect sparse points and cameras; optionally undistort, use Quick Align and fine adjustments, then write the aligned model.
+5. **Train:** connect Active Dataset to Brush Dataset, optionally supply the aligned sparse model override, prepare and run Brush Train.
+6. **Inspect or recapture:** inspect a PLY, replay video cameras, or capture a visible Rhino scene for a new training dataset.
 
-### Alignment in Grasshopper
+Open the included [SP_020 working template](Examples/Splatypus_Workflow.gh) with the solver disabled. Set your own project folder, media and executable paths, review saved controls, then run each stage deliberately. See the [example notes](Examples/README.md) and [user guide](Documentation/User-guide.md) for exact wiring.
 
-![Grasshopper definition demonstrating model realignment and camera inspection](Documentation/assets/alignment-demo.png)
+## Components
 
-Demonstration from the **Splatypus_pre** project presentation: transform geometry and camera poses into a useful Rhino coordinate system. This development screenshot illustrates the workflow; use the included 0.1.0 example for current component connections.
+Version 0.2.0 has **25 visible components** across six toolbar groups. The retained Model Report component is hidden from the toolbar; 26 icons are embedded in the plugin.
 
-<details>
-<summary><strong>Explore the 21 release components</strong></summary>
+| Group | Components |
+| --- | --- |
+| 01 Setup | Download Tools, Hello, Project |
+| 02 dataset | FFmpeg Setup, Media Import |
+| 03 COLMAP | Export Model, Feature Extract, Match, Pipeline, Setup, Sparse Reconstruct, Undistort Images |
+| 04 Realignment | Align COLMAP Model, Camera Planes, Geometry Translator, Quick Align, Sparse Point Cloud |
+| 05 Training | Active Dataset, Brush Dataset, Brush Train |
+| 06 Preview | Auto Background, Splat Preview, Video Frames, Video Playback, View Capture |
 
-![The 21 Splatypus components grouped by workflow stage](Publication/assets/splatypus-components-1600x1000.png)
+[Component inventory](Publication/assets/component-inventory.json) · [Toolbar details](Toolbar-order.md)
 
-[Component inventory](Publication/assets/component-inventory.json)
+## Source code and documentation
 
-</details>
+The repository includes the plugin and Core source, build scripts, tests, component artwork, documentation, working example and versioned packages. Browse the complete source for **[v0.2.0](https://github.com/Zemi-jpg/Splatypus/tree/v0.2.0)** or **[v0.1.0](https://github.com/Zemi-jpg/Splatypus/tree/v0.1.0)**. GitHub Releases also provides a source ZIP and tarball for each tag.
 
-## Documentation and support
+Build with the **.NET 8 SDK**:
 
-- [Quick-start PDF](Publication/Splatypus-Quick-Start.pdf) — installation and a first workflow.
-- [User guide](Documentation/User-guide.md) — capture, reconstruction, alignment and training.
-- [Troubleshooting](Documentation/Troubleshooting.md) — loading, downloads, datasets and training.
-- [Privacy and local data](Documentation/Privacy.md) — project files, downloads and logs.
-- [Release notes](CHANGELOG.md) — features and limits of 0.1.0.
-- [Development guide](Documentation/Development.md) — source builds, verification and future releases.
+```powershell
+dotnet build RhinoSplat.Grasshopper.csproj -c Release
+dotnet build RhinoSplat.Grasshopper.Mac.csproj -c Release
+```
 
-For support, [open an issue](https://github.com/Zemi-jpg/Splatypus/issues) or email **[lizeming2021@gmail.com](mailto:lizeming2021@gmail.com)**. Include the plugin, Rhino, OS and external-tool versions, steps to reproduce, and a short log excerpt with personal paths removed.
+The projects pin the Rhino 8.34 SDK through NuGet. External tool binaries and Rhino host assemblies are not bundled. See the [development guide](Documentation/Development.md) for tests, native checks and packaging.
+
+- [User guide](Documentation/User-guide.md) - media import, alignment, training, playback and capture.
+- [Quick-start PDF](Publication/Splatypus-Quick-Start.pdf) - installation and a shorter workflow walkthrough.
+- [Troubleshooting](Documentation/Troubleshooting.md) and [privacy](Documentation/Privacy.md).
+- [Quick alignment](Quick-alignment.md), [video playback](Video-playback.md), [viewport capture](Viewport-capture.md) and [automatic backgrounds](Auto-background.md).
+
+For support, [open an issue](https://github.com/Zemi-jpg/Splatypus/issues) or email **[lizeming2021@gmail.com](mailto:lizeming2021@gmail.com)**. Include versions, steps to reproduce and a short log excerpt with personal paths removed.
 
 ## Licenses and credits
 
 Copyright © 2026 **Zeming Li**. Splatypus and the included example use the [MIT License](LICENSE.txt). See [NOTICE.txt](NOTICE.txt) and [third-party notices](THIRD-PARTY-NOTICES.md).
 
-[FFmpeg](https://ffmpeg.org/), [COLMAP](https://colmap.github.io/) and [Brush](https://github.com/ArthurBrussee/brush) are separate projects with their own licenses. Their binaries and Rhino SDK libraries are not bundled in the release. Rhino, Grasshopper and food4Rhino are McNeel products and services; references describe interoperability and imply no endorsement.
+[FFmpeg](https://ffmpeg.org/), [COLMAP](https://colmap.github.io/) and [Brush](https://github.com/ArthurBrussee/brush) are separate projects with their own licenses. Rhino, Grasshopper and food4Rhino are McNeel products and services; references describe interoperability and imply no endorsement.

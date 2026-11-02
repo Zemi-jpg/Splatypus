@@ -86,7 +86,7 @@ public sealed class ColmapSparseMapperComponent : SpTaskCapableComponent<ColmapR
         dataAccess.SetData(3, latest.Status);
     }
 
-    public override GH_Exposure Exposure => GH_Exposure.quarternary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
 
     public override Guid ComponentGuid => new("4596BF8E-17B0-4E17-9C84-7CC6CB9337D2");
 

@@ -1,6 +1,6 @@
 # Geometry Translator and COLMAP alignment
 
-Geometry Translator solves once per geometry branch. Combining a point cloud and camera planes can therefore emit the same five-transform sequence under both `{0;0;0}` and `{0;1;0}`.
+Geometry Translator solves once per geometry branch. Combining a point cloud and camera planes can therefore emit the same transform sequence under both `{0;0;0}` and `{0;1;0}`. The sequence contains five local transforms, or the Previous transforms followed by those five when an earlier alignment is connected.
 
 Previously SP Align COLMAP Model concatenated the branches and applied all ten transforms to the complete model, producing a different result from the geometry preview. For example, scale 16.23 was applied twice, resulting in scale 263.4129.
 

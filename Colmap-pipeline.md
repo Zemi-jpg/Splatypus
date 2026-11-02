@@ -29,6 +29,8 @@ Replacement work is staged and validated before publication. Failed or cancelled
 
 ## COLMAP All controls
 
+In 0.2.0, Pipeline and the renamed **SP COLMAP Match** expose Matching=0 Exhaustive (default), 1 Sequential, 2 Spatial, or 3 Auto. Pipeline and Feature Extract expose Extract Size=3200 and Features=8192. See [0.2.0 options](Version-0.2.0-options.md) for position prerequisites, Auto selection, and feature-database rebuilding.
+
 Find **Splatypus â†’ 03 COLMAP â†’ COLMAP All**. Connect **Exe** and **Root** and press **Run**. Extract, Match, Sparse and Export default to True. **Undistort defaults to False.** Enable it to overwrite the active pair after reconstruction.
 
 Disable stages to reuse existing prerequisites. **Replace** permits sparse reconstruction to replace an existing model; optional undistortion and text refresh always replace their current results after success. Model-changing stages automatically synchronize the readable text view; Export also provides a standalone refresh.

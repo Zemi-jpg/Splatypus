@@ -1,7 +1,8 @@
 namespace RhinoSplat.Core;
 
 public sealed record FFmpegMediaRequest(string Executable, string ProjectRoot,
-    IReadOnlyList<string> Sources, double FramesPerSecond, bool ReplaceExisting, bool ShowTerminal);
+    IReadOnlyList<string> Sources, double FramesPerSecond, bool ReplaceExisting, bool ShowTerminal,
+    MediaImageFormat ImageFormat = MediaImageFormat.Jpeg, bool SkipNearDuplicates = false);
 
 public sealed record FFmpegMediaSessionState(FFmpegMediaEstimateResult? Estimate,
     FFmpegMediaImportResult? Import, bool IsEstimating, bool IsImporting, bool IsCancelling)
@@ -57,8 +58,10 @@ public sealed class FFmpegMediaImportSession : IDisposable
                 {
                     // Coalesce rapid slider changes; cancelled requests never start ffprobe.
                     await Task.Delay(150, cancellation.Token).ConfigureAwait(false);
-                    return await _estimator.EstimateAsync(input.Executable, input.ProjectRoot,
+                    var result = await _estimator.EstimateAsync(input.Executable, input.ProjectRoot,
                         input.Sources, input.FramesPerSecond, cancellation.Token).ConfigureAwait(false);
+                    return input.SkipNearDuplicates && result.EstimatedImages.HasValue
+                        ? result with { Status = result.Status + " Count is before duplicate removal; actual output may be lower." } : result;
                 }
                 catch (OperationCanceledException)
                 {
@@ -92,7 +95,7 @@ public sealed class FFmpegMediaImportSession : IDisposable
                 {
                     return await FFmpegMediaImporter.RunAsync(input.Executable, input.ProjectRoot,
                         input.Sources, input.FramesPerSecond, input.ReplaceExisting, input.ShowTerminal,
-                        cancellation.Token).ConfigureAwait(false);
+                        cancellation.Token, input.ImageFormat, input.SkipNearDuplicates).ConfigureAwait(false);
                 }
                 catch (Exception exception)
                 {
@@ -130,6 +133,7 @@ public sealed class FFmpegMediaImportSession : IDisposable
     private static bool SameEstimateInputs(FFmpegMediaRequest left, FFmpegMediaRequest? right) =>
         right is not null && left.Executable == right.Executable && left.ProjectRoot == right.ProjectRoot
         && left.FramesPerSecond.Equals(right.FramesPerSecond)
+        && left.ImageFormat == right.ImageFormat && left.SkipNearDuplicates == right.SkipNearDuplicates
         && left.Sources.SequenceEqual(right.Sources, StringComparer.Ordinal);
 
     private static async Task CancelInBackground(CancellationTokenSource? cancellation)

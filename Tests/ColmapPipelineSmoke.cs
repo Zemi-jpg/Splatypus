@@ -12,6 +12,7 @@ if (args.Length > 0)
     while (!File.Exists(Path.Combine(folder.FullName, ".test-root"))) folder = folder.Parent ?? throw new Exception("Missing fixture root");
     var root = folder.FullName;
     File.AppendAllText(Path.Combine(root, "order.txt"), stage + "\n");
+    File.AppendAllText(Path.Combine(root, "arguments.txt"), stage + " " + string.Join(" ", args.Skip(1)) + "\n");
     Console.WriteLine("running " + stage);
     if (File.Exists(Path.Combine(root, "stall")))
     {
@@ -98,6 +99,22 @@ result = await ColmapPipelineRunner.RunAsync(exportOnly, CancellationToken.None)
 Check(result.Succeeded && result.Completed == 2 && File.ReadAllLines(Path.Combine(full.ProjectRoot, "order.txt")).Last() == "model_converter", "Export-only reuses existing model and counts only selected stages.");
 Check(File.Exists(Path.Combine(result.DatasetPath, "images", "keep.txt")) && !File.Exists(Path.Combine(result.TextPath, "replace.txt")), "Replace only modifies enabled stage output.");
 var missing = Request("missing") with { Extract = false };
+var sequential = Request("sequential") with { Matching = ColmapMatchingMode.Sequential, MaxImageSize = 1600, MaxNumFeatures = 4096, Undistort = false };
+var sequentialResult = await ColmapPipelineRunner.RunAsync(sequential, default);
+Check(sequentialResult.Succeeded && File.ReadAllLines(Path.Combine(sequential.ProjectRoot, "order.txt")).Contains("sequential_matcher"), "Pipeline runs the selected sequential matcher.");
+var actualArguments = File.ReadAllText(Path.Combine(sequential.ProjectRoot, "arguments.txt"));
+Check(actualArguments.Contains("--SiftExtraction.max_image_size 1600") && actualArguments.Contains("--SiftExtraction.max_num_features 4096"), "Optional extraction limits reach the child process.");
+var databasePath = Path.Combine(sequential.ProjectRoot, "colmap", "database.db");
+File.WriteAllText(databasePath, "old features");
+Check((await ColmapFeatureExtractionRunner.RunAsync(executable, sequential.ProjectRoot, false, default, new(1200, 2048))).Succeeded
+    && File.ReadAllText(databasePath) == "database", "Changing feature settings actually rebuilds stored features.");
+File.WriteAllText(databasePath, "reuse these features");
+var previousArguments = File.ReadAllLines(Path.Combine(sequential.ProjectRoot, "arguments.txt")).Length;
+var invalidFeatures = await ColmapFeatureExtractionRunner.RunAsync(executable, sequential.ProjectRoot, false, default, new(0, 8192));
+Check(!invalidFeatures.Succeeded && File.ReadAllText(databasePath) == "reuse these features"
+    && File.ReadAllLines(Path.Combine(sequential.ProjectRoot, "arguments.txt")).Length == previousArguments, "Invalid extraction limits preserve the existing database and launch no process.");
+var invalidMatching = Request("invalid matching") with { Matching = (ColmapMatchingMode)99 };
+Check(!(await ColmapPipelineRunner.RunAsync(invalidMatching, default)).Succeeded && !File.Exists(Path.Combine(invalidMatching.ProjectRoot, "order.txt")), "Invalid matcher is rejected before any pipeline stage runs.");
 result = await ColmapPipelineRunner.RunAsync(missing, CancellationToken.None);
 Check(!result.Succeeded && result.Status.Contains("database") && !File.Exists(Path.Combine(missing.ProjectRoot, "order.txt")), "Skipped prerequisite validation prevents launching processes.");
 var failure = Request("failure");

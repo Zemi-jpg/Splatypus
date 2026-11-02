@@ -15,8 +15,16 @@ public sealed class ColmapExhaustiveMatchingComponent : SpTaskCapableComponent<C
     private ColmapRunResult? _lastResult;
 
     public ColmapExhaustiveMatchingComponent()
-        : base("SP COLMAP Exhaustive Match", "Match", "Matches every image pair in the COLMAP database. Toggle Run from False to True to start once.", "Splatypus", "03 COLMAP")
+        : base("SP COLMAP Match", "Match", "Matches COLMAP images using Exhaustive, Sequential, Spatial or Auto. Toggle Run from False to True to start once.", "Splatypus", "03 COLMAP")
     {
+    }
+
+    public override bool Read(GH_IO.Serialization.GH_IReader reader)
+    {
+        var missing = AppendedInputs.BeforeRead(this, reader, "Matching Method");
+        var result = base.Read(reader); AppendedInputs.AfterRead(this, missing);
+        _previousRun = true;
+        return result;
     }
 
     protected override void RegisterInputParams(GH_InputParamManager parameters)
@@ -25,6 +33,7 @@ public sealed class ColmapExhaustiveMatchingComponent : SpTaskCapableComponent<C
         parameters.AddTextParameter("Project Root", "Root", "Connect the Root output from SP Project.", GH_ParamAccess.item);
         parameters.AddBooleanParameter("Run", "Run", "Starts on a False-to-True toggle. Toggle False before running again.", GH_ParamAccess.item, false);
         parameters.AddBooleanParameter("Show Terminal", "Terminal", "When True, opens a terminal window with COLMAP's live log.", GH_ParamAccess.item, false);
+        parameters.AddIntegerParameter("Matching Method", "Matching", ColmapPipelineComponent.MatchingDescription, GH_ParamAccess.item, 0);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager parameters)
@@ -48,7 +57,8 @@ public sealed class ColmapExhaustiveMatchingComponent : SpTaskCapableComponent<C
                 return;
 
             Message = "Running…";
-            TaskList.Add(Task.Run(() => ColmapExhaustiveMatchingRunner.RunAsync(executable, projectRoot, showTerminal, CancelToken), CancelToken));
+            var matching = 0; dataAccess.GetData(4, ref matching);
+            TaskList.Add(Task.Run(() => ColmapExhaustiveMatchingRunner.RunAsync(executable, projectRoot, showTerminal, CancelToken, (ColmapMatchingMode)matching), CancelToken));
             return;
         }
 
@@ -70,7 +80,7 @@ public sealed class ColmapExhaustiveMatchingComponent : SpTaskCapableComponent<C
         dataAccess.SetData(3, latest.Status);
     }
 
-    public override GH_Exposure Exposure => GH_Exposure.tertiary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
 
     public override Guid ComponentGuid => new("4D443761-8A03-42C9-B42C-9BEC9427A0AA");
 

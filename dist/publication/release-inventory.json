@@ -1,6 +1,6 @@
 {
   "package": "Splatypus",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Zeming Li",
   "copyrightHolder": "Zeming Li",
   "license": "MIT",
@@ -8,19 +8,24 @@
   "website": "https://zeming.li/",
   "minimumRhinoSdk": "8.34.26223.11001",
   "runtime": ".NET 8",
+  "example": {
+    "path": "Examples/Splatypus_Workflow.gh",
+    "source": "SP_020",
+    "sha256": "7ea9336782631a3d519eb9bec896570734a528e99d79a3023c521bf6bf4b25f0"
+  },
   "artifacts": [
     {
       "platform": "windows",
-      "yak": "splatypus-0.1.0-rh8_34-win.yak",
-      "zip": "Splatypus-0.1.0-windows.zip",
-      "assemblyVersion": "0.1.0.0",
+      "yak": "splatypus-0.2.0-rh8_34-win.yak",
+      "zip": "Splatypus-0.2.0-windows.zip",
+      "assemblyVersion": "0.2.0.0",
       "tag": "rh8_34-win"
     },
     {
       "platform": "macos",
-      "yak": "splatypus-0.1.0-rh8_34-mac.yak",
-      "zip": "Splatypus-0.1.0-macos.zip",
-      "assemblyVersion": "0.1.0.0",
+      "yak": "splatypus-0.2.0-rh8_34-mac.yak",
+      "zip": "Splatypus-0.2.0-macos.zip",
+      "assemblyVersion": "0.2.0.0",
       "tag": "rh8_34-mac"
     }
   ],

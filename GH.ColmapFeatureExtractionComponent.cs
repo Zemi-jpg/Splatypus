@@ -19,12 +19,22 @@ public sealed class ColmapFeatureExtractionComponent : SpTaskCapableComponent<Co
     {
     }
 
+    public override bool Read(GH_IO.Serialization.GH_IReader reader)
+    {
+        var missing = AppendedInputs.BeforeRead(this, reader, "Extraction Max Image Size", "Maximum Features");
+        var result = base.Read(reader); AppendedInputs.AfterRead(this, missing);
+        _previousRun = true;
+        return result;
+    }
+
     protected override void RegisterInputParams(GH_InputParamManager parameters)
     {
         parameters.AddTextParameter("COLMAP Executable", "Exe", "Full path to the COLMAP executable.", GH_ParamAccess.item);
         parameters.AddTextParameter("Project Root", "Root", "Connect the Root output from SP Project.", GH_ParamAccess.item);
         parameters.AddBooleanParameter("Run", "Run", "Starts on a False-to-True toggle. Toggle False before running again.", GH_ParamAccess.item, false);
         parameters.AddBooleanParameter("Show Terminal", "Terminal", "When True, opens a terminal window with COLMAP's live log.", GH_ParamAccess.item, false);
+        parameters.AddIntegerParameter("Extraction Max Image Size", "Extract Size", "Longest side for feature extraction. Default 3200. Changed settings rebuild the feature database.", GH_ParamAccess.item, 3200);
+        parameters.AddIntegerParameter("Maximum Features", "Features", "Maximum features per image. Default 8192. Changed settings rebuild the feature database.", GH_ParamAccess.item, 8192);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager parameters)
@@ -48,8 +58,10 @@ public sealed class ColmapFeatureExtractionComponent : SpTaskCapableComponent<Co
                 return;
 
             Message = "Running…";
+            var size = 3200; var features = 8192;
+            dataAccess.GetData(4, ref size); dataAccess.GetData(5, ref features);
             TaskList.Add(Task.Run(
-                () => ColmapFeatureExtractionRunner.RunAsync(executable, projectRoot, showTerminal, CancelToken),
+                () => ColmapFeatureExtractionRunner.RunAsync(executable, projectRoot, showTerminal, CancelToken, new(size, features)),
                 CancelToken));
             return;
         }
@@ -72,7 +84,7 @@ public sealed class ColmapFeatureExtractionComponent : SpTaskCapableComponent<Co
         dataAccess.SetData(3, latest.Status);
     }
 
-    public override GH_Exposure Exposure => GH_Exposure.secondary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
 
     public override Guid ComponentGuid => new("7B3F68C6-E10E-406C-945A-C175AEE44E93");
 

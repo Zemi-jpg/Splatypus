@@ -1,22 +1,12 @@
-# Splatypus
+# Splatypus 0.2.0
 
-Photogrammetry and Gaussian splat training workflows for Grasshopper in Rhino 8. Splatypus connects FFmpeg media import, COLMAP camera reconstruction, alignment, Brush training and colored point-cloud preview.
+Splatypus connects local FFmpeg, COLMAP and Brush applications through Grasshopper in Rhino 8. Import photographs or video, reconstruct cameras, align the result to Rhino geometry and train a Gaussian splat. You can also capture an existing Rhino scene from known camera frames and train from those images directly.
 
-**Author:** Zeming Li · **Support:** [lizeming2021@gmail.com](mailto:lizeming2021@gmail.com) · **Website:** [zeming.li](https://zeming.li/) · **License:** MIT
+Use Rhino 8.34 or newer with Grasshopper and .NET 8. FFmpeg, COLMAP and Brush are installed separately; Brush needs a compatible GPU. See [installation](#installation) for platform requirements and tool setup.
 
-This README describes the first public release, **0.1.0**, and is the complete package guide. The [quick-start PDF](Splatypus-Quick-Start.pdf) provides a shorter walkthrough.
+**Author:** Zeming Li | **Support:** [lizeming2021@gmail.com](mailto:lizeming2021@gmail.com) | **Website:** [zeming.li](https://zeming.li/) | **License:** MIT
 
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Example and first workflow](#example-and-first-workflow)
-- [External tools](#external-tools)
-- [Media import](#media-import)
-- [COLMAP and the active dataset](#colmap-and-the-active-dataset)
-- [Alignment and geometry](#alignment-and-geometry)
-- [Training and preview](#training-and-preview)
-- [Troubleshooting](#troubleshooting)
-- [Privacy and local data](#privacy-and-local-data)
-- [Licenses and credits](#licenses-and-credits)
+This is the complete package manual for version **0.2.0**. The [quick-start PDF](Splatypus-Quick-Start.pdf) gives a shorter walkthrough. The included template is [Examples/Splatypus_Workflow.gh](Examples/Splatypus_Workflow.gh).
 
 ## Requirements
 
@@ -43,7 +33,7 @@ The version subfolder contains the plugin, this README, the PDF and the Examples
 Close Rhino. Open PowerShell in the folder containing the Windows package and run:
 
 ```powershell
-& "C:\Program Files\Rhino 8\System\Yak.exe" install ".\splatypus-0.1.0-rh8_34-win.yak"
+& "C:\Program Files\Rhino 8\System\Yak.exe" install ".\splatypus-0.2.0-rh8_34-win.yak"
 ```
 
 Restart Rhino. For macOS, use the matching `mac.yak` and Rhino's Yak tool at `/Applications/Rhino 8.app/Contents/Resources/bin/yak`. Local installation does not publish a package.
@@ -54,23 +44,191 @@ Unblock the downloaded ZIP in Windows Properties if that option is present, then
 
 Install both libraries together. Uninstall Yak packages through Package Manager, then restart Rhino. Save your working definition outside the installed package folder. Uninstalling leaves project data and downloaded tools on disk.
 
-## Example and first workflow
+## Choose a workflow
 
-Open [Examples/Splatypus_Workflow.gh](Examples/Splatypus_Workflow.gh) after installing the plugin. Disable the Grasshopper solver while checking its saved settings. The example's local Parent Folder is blank; set your own project folder, media source, executable paths and output locations. Review Create, Download, Run and Replace inputs before enabling the solver. Save a working copy outside the installed package folder.
+| Goal | Workflow |
+| --- | --- |
+| Train from photographs or video | Project → Media Import → COLMAP Pipeline → Brush Dataset → Brush Train |
+| Align a reconstruction to Rhino geometry | Sparse Point Cloud + Camera Planes → Quick Align → optional Geometry Translator → Align COLMAP Model |
+| Replay a reconstructed video camera path | Video Frames → Video Playback |
+| Retrain a Rhino scene with design geometry | Camera Planes Frames → View Capture → Brush Dataset → Brush Train |
 
-The example contains the current workflow components and connections. Photographs, video, trained models and external tools are not bundled.
+The sections below explain the connections and run order. Components are under the **Splatypus** tab; names such as **Root**, **Dataset** and **Xforms** refer to their sockets.
 
-1. **SP Hello:** check that the plugin loads.
-2. **SP Project:** choose a writable Parent Folder and Project Name; enable Create. Connect its Root to downstream components.
-3. **SP Download Tools:** install tools or use your own executable paths.
-4. **SP Media Import:** import photographs/video and inspect the images.
-5. **SP COLMAP Pipeline:** reconstruct cameras and sparse points. Alternatively, use the individual COLMAP stages.
-6. Optionally undistort the images and align the model.
-7. Connect **Root -> SP Active Dataset -> SP Brush Dataset**; enable Prepare.
-8. **SP Brush Train:** start with a short training test and a new Job Name.
-9. **SP Splat Preview:** inspect an exported PLY as colored points.
+## Set up a project and tools
 
-Use Buttons for Run and Cancel, or reset a held toggle to False before starting another job. Do not run two reconstruction sequences simultaneously on the same project, or change its dataset during training.
+1. Place **SP Project** under **01 Setup**. Choose a writable local **Parent Folder** and **Project Name**, then set **Create=True**. Its **Root** output is the shared project path.
+2. Use **SP Download Tools** to install external tools, or supply your installed executable paths. Its FFmpeg, COLMAP and Brush outputs connect to the corresponding Exe inputs. Setup components validate paths; COLMAP Setup also prepares project folders. FFprobe must be beside FFmpeg for video estimates.
+3. Use Buttons for **Run**, **Write** and **Cancel**. If using a toggle, return it to False before another run. Review saved True and Replace settings before enabling an existing definition.
+
+Keep original media outside the project as a backup. Avoid running two operations on the same dataset at once, and do not change its images or cameras while training.
+
+The included [Splatypus_Workflow.gh](Examples/Splatypus_Workflow.gh) is the SP_020 working template for version 0.2.0. Disable the solver before opening it, set your own media, folders and tool paths, and save a working copy outside the installation folder. Review its saved paths, controls and connections before running.
+
+## Import photographs or video
+
+Use sharp images with strong overlap, varied viewpoints and visible detail. Moving subjects, reflections and textureless surfaces can make reconstruction difficult.
+
+1. Connect **SP FFmpeg Setup → FFmpeg** to **SP Media Import → Exe**, and **SP Project → Root** to **Root**.
+2. Supply files or folders to **Media**. Folders are searched recursively. **FPS** controls video sampling; the default is 2 frames per second. Each still photograph contributes one image.
+3. Choose **Format** and optionally enable **Skip Duplicates**. Review **Estimate** and **Probe**; refresh the estimate after changing files inside a source folder.
+4. Press **Run**, wait for success and inspect the imported images before reconstructing.
+
+| Setting | Default | Use |
+| --- | --- | --- |
+| Format | 0 — JPEG | Choose 1 for PNG to preserve existing source transparency. PNG does not remove backgrounds. |
+| Skip Duplicates | False | Skip near-identical sampled video frames. Still photographs remain. |
+| Replace | False | Replace images managed by Media Import, including its earlier JPEG/PNG imports. |
+
+Matching-format stills are copied without re-encoding, retaining existing metadata. Converting formats does not guarantee EXIF/GPS retention. Keep geotagged JPEG photographs as JPEG when that metadata matters.
+
+Estimate is the approximate count **before** duplicate filtering. Check coverage after filtering. Imports save surviving-frame timing in `ffmpeg-media.json` beside `images`; keep this record for playback. Importing new media invalidates the previous reconstruction and feature database, so reconstruct again before training.
+
+
+## Reconstruct cameras with COLMAP
+
+Connect **SP Download Tools → COLMAP** (or a full COLMAP executable path) to **SP COLMAP Pipeline → Exe**, and connect project **Root** to **Root**. The pipeline's canvas nickname is **COLMAP All**. **Extract**, **Match**, **Sparse** and **Export** default to True; **Undistort** defaults to False. Press **Run** and follow **Status**, **Progress** and **Log**. **Replace=True** permits a new sparse reconstruction to replace the active model.
+
+Alternatively, run **SP COLMAP Feature Extract**, **SP COLMAP Match**, **SP COLMAP Sparse Reconstruct** and **SP COLMAP Export Model** individually. Use either the pipeline or the individual stages for a given run.
+
+| Matching | Method | Choose it when |
+| --- | --- | --- |
+| 0 | Exhaustive — default | You need all image pairs considered, including mixed photos and videos. Large sets can be expensive. |
+| 1 | Sequential | Images form an ordered sequence, such as one video. |
+| 2 | Spatial | Every database image has a usable position prior, and positions are not all identical. |
+| 3 | Auto | You want Spatial with complete usable positions, otherwise Sequential for one confirmed recorded video, otherwise Exhaustive. |
+
+Geotagged photographs can provide position priors. Drone video telemetry and sidecars are not automatically assigned to extracted frames. Status and the log explain Auto's choice.
+
+**Extract Size=3200** limits the longest image side used for feature extraction; **Features=8192** limits features per image. These controls do not resize stored source images. Changing either rebuilds stored features and clears old matches: run extraction and matching again before reconstructing.
+
+Connect **Root → SP Active Dataset → Dataset** to **SP Sparse Point Cloud** and **SP Camera Planes** to inspect the result. The project has one active base image/model pair. Optional **SP COLMAP Undistort Images** replaces its images and camera calibration together, updates the text model and clears stale feature data. COLMAP may omit unregistered images during undistortion. Verify transparency afterwards if you rely on alpha.
+
+Reconstruction has no inherent real-world scale without a reference. See COLMAP and active datasets for stage reuse and replacement details.
+
+## Align the reconstruction to Rhino geometry
+
+Alignment has two steps: preview a transform, then **write it to the camera model**. Moving preview geometry alone does not change the cameras used for training or video playback.
+
+### Quick alignment with three point pairs
+
+1. Keep **SP Sparse Point Cloud** and **SP Camera Planes** connected to the original active Dataset. Connect **Sparse Point Cloud → Cloud** to **SP Quick Align → Cloud**, and **Camera Planes → Planes** (optionally Centres too) to **Quick Align → Cameras**.
+2. Hide upstream cloud and camera previews to see Quick Align's result clearly.
+3. Double-click **SP Quick Align**. Pick a highlighted sparse point, then its matching reference point on native Rhino geometry. Repeat for three pairs in the order source 1/reference 1, source 2/reference 2, source 3/reference 3. Use widely separated points forming a triangle and Rhino object snaps for the references.
+4. Inspect the transformed Cloud and Cameras. **Error** reports the RMS fitting distance in Rhino document units. Double-click again to refine the currently aligned result; **Xform** remains the complete transform from the original model.
+
+**Esc** cancels picking and retains the last completed alignment. **Reset** restores original coordinates and outputs an identity transform. Completed picks and Reset support Grasshopper Undo, and pairs are saved with the definition. If the source cloud changes, repick or Reset before writing. Reset does not reset Geometry Translator's sliders.
+
+### Fine adjustment and saving
+
+For Quick Align alone, connect **Xform → SP Align COLMAP Model → Xforms**. Supply the original **Dataset** and COLMAP **Exe**, then press **Write**.
+
+For fine adjustment:
+
+1. Connect Quick Align's **Cloud** and **Cameras** to **SP Geometry Translator → Geo**. Choose **CenPt** in the already aligned coordinates, then adjust movement, rotation in degrees and positive uniform scale.
+2. Connect **Quick Align → Xform** to **Geometry Translator → Previous**. Previous records the earlier alignment for saving; the geometry input already contains that alignment.
+3. Connect **Geometry Translator → Transforms** directly to **Align COLMAP Model → Xforms**, supply the original Dataset and Exe, and press **Write**. Release any Data Dam before writing.
+
+Do not flatten duplicate transform branches from cloud and camera geometry, or add Quick Align's transform a second time. The writer uses identical branches once; different sequences require selecting the intended branch. Without Quick Align, use Geometry Translator on the original previews and leave Previous empty.
+
+Write creates the separate `colmap/aligned` model from the active base. Repeated writes always start from that base. It transforms all reconstructed points and camera poses, including those omitted by preview limits, while preserving intrinsics.
+
+Use **Aligned Text Model** for a separate saved-result preview and **Aligned Sparse Model → Brush Dataset → Sparse Model Override** for aligned training. After reconstructing or undistorting again, rewrite the alignment. Keep the base Dataset connected to the alignment source previews.
+
+
+## Prepare and train with Brush
+
+1. Connect **Root → SP Active Dataset**, then **Dataset → SP Brush Dataset → Dataset**. Set **Prepare=True**.
+2. To train in aligned coordinates, also connect **Align COLMAP Model → Aligned Sparse Model** to **Brush Dataset → Sparse Model Override**. Leave the override empty to use the active base model.
+3. Connect **Brush Dataset → Dataset** to **SP Brush Train → Dataset**. Supply **Brush Exe**, project **Root** and a new **Job Name**.
+4. Start with a short test before using the default **30,000 Steps**. **Viewer=True** opens Brush's viewer; choose False for background training without that viewer. Press **Run**.
+
+| Training control | Default | Effect |
+| --- | --- | --- |
+| Resolution | 1920 | Maximum image side loaded for training; independent of COLMAP extraction resolution. |
+| Max Splats | 10,000,000 | Upper bound on splat growth. Final count can be smaller. |
+| Replace | False | True deletes the selected job's previous exports before training. Use a new Job Name to keep them. |
+
+Training runs outside Grasshopper's document solution, so you can continue working. Inputs are captured at the start; edits affect the next job. Brush still shares GPU resources with Rhino. Lower resolution and splat counts can reduce workload but do not guarantee a GPU-memory limit.
+
+**Cancel** stops the job and retains already exported checkpoints. Outputs update when the process exits. Read **Status**, **Code** and **Log**; the full log and PLY exports are in `output/<job name>`. Removing the component or closing its document cancels its job.
+
+Brush Dataset links to project images and the model rather than copying them. The filesystem must support directory links; Windows can fall back to junctions. Keep project files available and prepare/check the handoff after model changes or moving a project.
+
+## Preview exported splats
+
+Load an exported binary little-endian PLY into **SP Splat Preview**. **Max=150,000** limits displayed points; reduce it for easier interaction. This component shows colored point centers. Use a separate compatible Gaussian renderer to inspect the full splat appearance.
+
+**Rotate for Visualization=True** in Brush Train writes an additional `_rgs.ply`, rotated +90 degrees around X for the external RhinoGaussianSplatting workflow. Both original and rotated files are in Export. Match the PLY and camera coordinates when combining them with Rhino geometry. No third-party renderer is bundled.
+
+## Replay a video camera track
+
+1. Connect **SP Active Dataset → Dataset** to **SP Video Frames → Dataset** under **06 Preview**. **Frames** lists existing JPEG/PNG paths in one branch per source video, excluding still photographs. **Videos** gives the corresponding zero-based indices; **Times** and **Registered** show timing and camera availability.
+2. Leave **Model** empty to prefer an existing aligned text model under `colmap`, falling back to the base text model. **Status** shows the selected path. To choose a specific model, connect a text model folder or project root to Model. Write alignment first if playback should follow aligned geometry.
+3. Connect **Tracks → SP Video Playback → Tracks**, leaving the list intact. Choose **Video Index** and activate a Rhino model viewport.
+4. Set **Play=True**. Set False to pause, change **Time** to seek, and enable **Preview** to apply the sought camera while paused.
+5. Adjust **Speed** (1 normal, 0.5 half speed, 2 double speed), **Loop** and **Smooth**. Smooth defaults to True and softens position and rotation jitter. It can shift intermediate poses; choose False to follow original positions with straight segments.
+6. Press **Restore View** to stop and return to the view saved before playback. Toggle Play off before starting again.
+
+Playback needs a COLMAP text model with registered cameras matching the frames. Missing poses interpolate between available cameras; a track with no registered camera cannot play. The Camera output is a plane with X right, Y up and negative Z forward. Playback animates the Rhino view; it does not export a movie or overlay the source video.
+
+New imports use saved timestamps, including gaps left by duplicate filtering. For older imports without `ffmpeg-media.json`, connect the original media files or mixed folder to **Video Frames → Media**. Older imports use a default pace of two extracted frames per second; adjust Speed as needed. Dataset changes update automatically; there is no FPS or Refresh input on Video Frames.
+
+
+## Capture a Rhino scene for retraining
+
+Use **SP View Capture** to record an existing scene, including visible native Rhino design geometry, from known camera positions. The captured images receive new calibration and can go directly to Brush without another COLMAP reconstruction.
+
+1. Put the scene and cameras in the same coordinates. For a saved alignment, load **Aligned Text Model** with **SP Camera Planes**. Connect **Camera Planes → Frames** to **SP View Capture → Frames**. Use Frames, not the preview surfaces on Planes; flatten multiple frame branches into one list.
+2. Make the desired geometry and renderer visible. Hide camera surfaces, sparse inspection clouds and other guides. For material-based capture, bake geometry or use a material-aware preview. Pause Video Playback and other camera animation.
+3. Choose a **fresh destination project Root**, separate from the source reconstruction. An initialized project with empty images and colmap folders is also accepted. Existing images, models or capture metadata are rejected.
+4. Choose **Width/Height** (default maximum 1920 × 1280), **Mode** (Rendered), **Lens** (35 mm equivalent), **Background** (white) and **Wait** (1 second). Increase Wait for a heavy renderer; try 2–3 seconds in a small batch.
+5. Activate an unlocked Rhino model viewport and press **Run**. Keep it visible and unchanged during capture. Avoid navigating, resizing, switching views or starting other Rhino commands. Keep other windows and the cursor away from the capture area.
+6. After success, inspect the PNGs. Connect **View Capture → Dataset** to **SP Brush Dataset → Dataset**, enable Prepare, then connect its Dataset to Brush Train. Use the captured project Root for Brush Train's Root. Leave Sparse Model Override empty for this new dataset.
+
+Capture moves the live Rhino camera, waits for the renderer, then saves through **ScreenCaptureToFile**. Width and Height define the aspect ratio and maximum size: larger requests are reduced to fit the visible viewport. **Status** reports the actual dimensions used in calibration. Enlarge the viewport before starting if you need more pixels. The original view and display mode are restored after completion or cancellation.
+
+Frames preserve position, orientation and roll, but contain no original lens calibration. Lens and aspect ratio define a new shared pinhole camera; they need not reproduce the original photographs' framing. Raytraced/progressive modes are unsupported. A renderer must support Rhino's screen capture; verify a small batch first. Capturing SP Splat Preview captures its point-cloud proxy.
+
+Images go directly into `Root/images`, cameras into `Root/colmap`, and the prepared Brush handoff into `Root/brush/dataset`. **Dataset** outputs the completed project Root. Calibration is saved as COLMAP binary/text files plus `transforms.json`; capture does not create reconstructed sparse points. Brush can initialize this camera-only dataset. Do not reconstruct or undistort these synthetic pinhole captures before training.
+
+**Cancel** preserves saved images under Root/images. Images and Dataset outputs are withheld until the complete batch succeeds. Inspect Status and `capture-progress.txt` after an interruption, then use a fresh Root for another batch.
+
+
+### Estimate a matching background
+
+**SP Auto Background** estimates a solid color or top/bottom gradient from baked PLY colors near camera boundaries.
+
+1. Connect the coordinate-matched **Splat PLY**. If the displayed splat object was transformed, supply the same **Transform**.
+2. Share View Capture's **Frames**, **Lens** and **Aspect** (Width / Height, default 1.5).
+3. For a gradient, connect **Bottom → View Capture Background** and **Top → Background Top**. For a solid fill, connect **BG → Background** and leave Background Top empty.
+4. Enable **Preview** to inspect the gradient in the active viewport. It fits one stable backdrop across supplied frames. Disable Preview to restore the normal backdrop. Wire colors explicitly to View Capture so the saved batch uses them.
+
+Keep the external splat renderer's relighting off when matching its baked appearance. Auto Background changes the viewport fill; it does not reconstruct missing scenery or alter lighting. Inspect Status if boundary samples are sparse or no colors are visible, and verify PLY/camera alignment. Without Frames, it samples the active viewport when it solves; recompute after changing that camera.
+
+
+## Project files and upgrading existing definitions
+
+| Data | Location relative to Root |
+| --- | --- |
+| Imported or captured images | `images` |
+| Base camera model | `colmap/sparse/0` |
+| Base readable text model | `colmap/sparse-text` |
+| Saved aligned model | `colmap/aligned/sparse/0` and `colmap/aligned/sparse-text` |
+| Brush handoff for imported media | `brush-dataset` |
+| Brush handoff for View Capture | `brush/dataset` |
+| Training exports and log | `output/<job name>` |
+| Import source/timing record | `ffmpeg-media.json` |
+
+Back up definitions and projects before upgrading, and keep one installed plugin copy with its matching Core library. New controls retain defaults when unconnected. **SP COLMAP Match** replaces the old Exhaustive Match name while keeping its component ID and Exhaustive default.
+
+Existing View Capture **Folder** connections become **Root** connections at the same socket. Point them at the destination project root, not its images subfolder. Video Frames migrates older media/model connections and removes retired FPS/Refresh sockets. In older dataset definitions, reconnect the project Dataset to Brush Dataset and use Aligned Sparse Model only as its optional model override. Check sockets before running; place a fresh component if an older instance does not migrate correctly.
+
+## Logs and recovery
+
+Enable **Terminal** before a run for live output where supported. Closing a terminal does not cancel its task; use Cancel. Preserve Status, Code and a short log excerpt for support. Media imports and viewport captures retain files already written after cancellation; completed Brush exports may also remain. A pipeline keeps successful earlier stages if a later stage fails.
+
+Read the Troubleshooting and Privacy and local data sections below before sharing datasets or logs. Native macOS validation of the new interactive alignment, playback and capture workflows remains a release testing step.
 
 ## External tools
 
@@ -86,56 +244,6 @@ Opening a definition discovers existing tools without starting a download. Valid
 Set Terminal=True before Download for live progress. The saved log is under `Tools Folder/logs`; closing the terminal does not cancel installation. Use Cancel. On macOS, terminal automation may require permission; processing continues even if a terminal cannot open.
 
 Downloads use GitHub and its release CDN. Apple Silicon additionally uses checksum-pinned micromamba 2.3.3 and private conda-forge environments. No system PATH or shell initialization changes are needed. Do not move installed Mac environments because they contain absolute paths. Unsupported automatic-install platforms can use manually supplied native executables where suitable tool builds exist.
-
-## Media import
-
-Connect FFmpeg Exe and Root to SP Media Import. Choose Media Sources and FPS. ffprobe must be beside FFmpeg. With Run=False, Estimated JPEGs reports approximately one image per still photograph plus video duration multiplied by FPS. Actual counts can differ at clip boundaries; Count reports the completed import's actual output.
-
-The estimate updates automatically when FPS, Media Sources, FFmpeg Exe or Project Root changes. If files inside the source folder change, refresh the estimate using the component's right-click menu on Windows, or its Refresh input on macOS. On Windows, choose **Refresh media estimate**; on macOS, connect a Button to **Refresh Estimate**. This refresh updates the displayed estimate; Run reads the current source files without requiring it. An unavailable estimate does not prevent an explicit import. Import runs in the background; input changes affect the next run. Cancel retains images already written. Status and Log show progress; the complete log is `ffmpeg-import.log` in the project folder.
-
-Use overlapping, sharp photographs from varied viewpoints. Motion, reflections and textureless surfaces are difficult. Start with a small capture; exhaustive matching becomes expensive as the image count grows. Keep original media backed up outside the project.
-
-## COLMAP and the active dataset
-
-SP COLMAP Pipeline, under **03 COLMAP**, runs Extract, Match, Sparse and Export by default. Undistort defaults to False. Connect COLMAP Exe and Root, then press Run. Disable stages only when their prerequisites already exist. Replace permits overwriting an existing sparse reconstruction. Progress reports selected stages completed; Terminal follows `colmap/pipeline.log`. Cancel stops the current process and skips later stages; earlier successful stages remain committed.
-
-For inspection between stages, run Feature Extract, Exhaustive Match, Sparse Reconstruct and Export separately. Use Model Report, Camera Planes and Sparse Point Cloud to inspect the result. Sparse reconstruction has no automatic real-world scale.
-
-Each project has one active base image/model pair. **Undistort Images** replaces both images and camera calibration together, refreshes the text model and clears stale feature data. COLMAP can omit unregistered images. Importing new media invalidates the previous reconstruction; reconstruct again before training.
-
-Keep **Root -> Active Dataset -> Brush Dataset** connected. Active Dataset refreshes after project operations; use Update after external edits. Re-prepare Brush Dataset after changing reconstruction, undistortion or its optional aligned override. Failed or cancelled replacements aim to retain the prior valid data; maintain independent backups.
-
-| Project data | Location under Root |
-| --- | --- |
-| Active images | `images` |
-| Base camera model and points | `colmap/sparse/0` |
-| Base readable text model | `colmap/sparse-text` |
-| Separate aligned model | `colmap/aligned/sparse/0` |
-| Aligned text model | `colmap/aligned/sparse-text` |
-| Linked Brush dataset | `brush-dataset/images` and `brush-dataset/sparse` |
-| Training exports and log | `output/<job name>` |
-
-## Alignment and geometry
-
-SP Geometry Translator copies input geometry and applies translation, world-axis X/Y/Z rotation, then uniform scale. Angles are degrees; rotation and scale use the moved centre. Connect its ordered **Transforms** output to **SP Align COLMAP Model > Xforms**. Use positive scale for alignment.
-
-One model needs one transform sequence. Identical branches are used once; different sequences produce an error. Select the intended branch rather than flattening duplicate sequences. Release any Data Dam before pressing Write.
-
-Alignment reads the base model and writes a **separate** model with transformed points and camera poses, preserving intrinsics. Repeated writes start from the base, so transformations do not accumulate. Keep the source previews connected to the base; preview **Aligned Text Model** separately. Connect **Aligned Sparse Model** to Brush Dataset's **Sparse Model Override** to train that branch. Write alignment again after reconstruction or undistortion changes the base.
-
-Camera-plane Size affects display rectangles, not saved camera poses. Compare points and camera centres when checking alignment.
-
-## Training and preview
-
-SP Brush Dataset prepares links to the active images and model; leave Sparse Model Override empty for the base model. Links require their targets to remain available and a suitable filesystem. Windows can fall back to directory junctions. Moving a project or deleting linked data can break the handoff.
-
-Connect Brush Exe, Dataset and Root to SP Brush Train. Choose a new Job Name to retain earlier runs. The default is 30,000 steps; begin with a short test. Viewer=False avoids opening Brush's additional viewer. **Replace=True deletes that job's previous exports before training.**
-
-Training runs in the background, but still shares graphics resources with Rhino. Input changes affect the next run. Cancel stops the owned process; completed checkpoints can remain. Closing the definition or removing the component cancels its job. Read Status, Code and the full `brush-training.log` under `output/<job name>`. Panels show a bounded log preview.
-
-SP Splat Preview reads binary little-endian PLY files as colored point clouds. Max defaults to 150,000 points; lower it for smoother interaction. Stored coordinates are preserved. Gaussian shape, transparency and view-dependent shading are not rendered.
-
-Rotate for Visualization optionally writes an additional `_rgs.ply`, rotated +90 degrees around X, for a compatible external RhinoGaussianSplatting workflow. The original PLY remains available. Previewing the rotated file does not apply another rotation. No third-party Rhino renderer is bundled.
 
 ## Troubleshooting
 

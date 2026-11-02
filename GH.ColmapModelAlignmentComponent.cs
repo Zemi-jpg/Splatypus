@@ -78,7 +78,7 @@ public sealed class ColmapModelAlignmentComponent : SpTaskCapableComponent<Colma
         if (latest.Succeeded) { da.SetData(0, latest.TextModelPath); da.SetData(1, latest.SparseModelPath); }
         da.SetData(2, latest.Log); da.SetData(3, latest.Status);
     }
-    public override GH_Exposure Exposure => GH_Exposure.quarternary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
     public override Guid ComponentGuid => new("BD8D1415-FE3B-4A33-A77B-6874AADC5967");
 
     internal static bool TryGetTransformSequence(GH_Structure<GH_Transform> tree, out List<Transform> sequence, out string error)

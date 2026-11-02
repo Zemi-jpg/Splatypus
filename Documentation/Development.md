@@ -6,7 +6,9 @@ The `v0.1.0` tag preserves the source, documentation and package files correspon
 
 Start updates on a feature branch from `main`. Commit related changes together, run the relevant checks, and merge reviewed changes back to `main`. Use a new version and a new annotated tag for each published release; do not move an existing release tag or replace its package files.
 
-The 0.1.0 projects explicitly exclude the experimental mesh components. Development experiments, generated reviews and local caches are not part of the release baseline.
+The 0.1.0 and 0.2.0 release projects explicitly exclude the experimental mesh components. Their source and tests remain in the repository for development; they are not part of the installable plugin.
+
+The current version is 0.2.0 (formerly planned as 0.1.1). Its tag and GitHub Release provide the complete source and four platform-specific installer archives. The historical v0.1.0 tag, packages and package manual remain preserved. Each release has its own checksum asset; dist/publication/SHA256SUMS.txt and release-inventory.json describe the current release.
 
 ## Build from source
 
@@ -19,9 +21,13 @@ dotnet build RhinoSplat.Grasshopper.Mac.csproj -c Release
 
 The projects pin RhinoCommon and Grasshopper SDK version 8.34.26223.11001 through NuGet. The Mac build is cross-compiled; native reconstruction and training must be checked on macOS separately. Build outputs use the temporary build root configured in Directory.Build.props.
 
+Viewport capture integration checks are in `Tests/RhinoSplat.ViewCapture.SmokeTest.csproj`. Build with `-c Release -o bin/ViewCapture/tests`, then run `Tests/RunViewCaptureTests.py` through Rhino's `_-RunPythonScript` in a separate test instance. Tests create their own document and retain verification images under `bin/ViewCapture/validation`. They cover image/calibration agreement, native geometry and display conduits, view restoration, cancellation, existing Brush handoff and saved Camera Planes sockets.
+
+Automatic backdrop checks are in `Tests/RhinoSplat.SplatBackground.SmokeTest.csproj` (PLY formats, bounded samples, opacity and robust color fitting) and `Tests/RhinoSplat.AutoBackgroundRhino.SmokeTest.csproj` (camera projection, transforms, Grasshopper outputs, preview modes/restoration and capture socket migration). See [automatic background](../Auto-background.md).
+
 ## Verify and package
 
-Verify the existing 0.1.0 downloads without rebuilding them:
+Verify the current release downloads without rebuilding them:
 
 ```powershell
 ./Publication/Verify-Release.ps1 -ReleaseFolder ./dist/publication

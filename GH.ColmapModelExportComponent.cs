@@ -86,7 +86,7 @@ public sealed class ColmapModelExportComponent : SpTaskCapableComponent<ColmapRu
         dataAccess.SetData(3, latest.Status);
     }
 
-    public override GH_Exposure Exposure => GH_Exposure.senary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
 
     public override Guid ComponentGuid => new("B823379E-8E4E-424C-8079-8B7C75ED9162");
 

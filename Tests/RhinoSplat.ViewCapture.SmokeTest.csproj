@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms><ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable><EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ViewCaptureSmoke.cs;../GH.ViewportCapture.cs;../GH.ViewCaptureComponent.cs;../GH.CameraPlanesComponent.cs;../GH.SpComponent.cs;../GH.ComponentIcons.cs" />
+    <ProjectReference Include="../RhinoSplat.Core.csproj" />
+    <Reference Include="RhinoCommon"><HintPath>C:/Program Files/Rhino 8/System/netcore/RhinoCommon.dll</HintPath></Reference>
+    <Reference Include="Grasshopper"><HintPath>C:/Program Files/Rhino 8/Plug-ins/Grasshopper/Grasshopper.dll</HintPath></Reference>
+    <Reference Include="GH_IO"><HintPath>C:/Program Files/Rhino 8/Plug-ins/Grasshopper/GH_IO.dll</HintPath></Reference>
+    <EmbeddedResource Include="../Assets/Icons-Splatypus/png24/camera-planes.png" LogicalName="RhinoSplat.Icons.camera-planes.png" />
+  </ItemGroup>
+</Project>

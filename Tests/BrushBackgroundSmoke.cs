@@ -76,7 +76,7 @@ using (var session = new BrushTrainingSession())
     }
     finally { if (Running(pid)) { using var process = Process.GetProcessById(pid); process.Kill(true); } }
 }
-var completeRequest = request with { JobName = "complete", TotalSteps = 1 };
+var completeRequest = request with { JobName = "complete", TotalSteps = 1, MaxResolution = 640, MaxSplats = 12345 };
 using (var session = new BrushTrainingSession())
 {
     var notifications = 0;
@@ -85,6 +85,9 @@ using (var session = new BrushTrainingSession())
     var done = await Finish(session, completeRequest);
     await Wait(() => Volatile.Read(ref notifications) == 1);
     Check(done.Result?.Succeeded == true && done.Result.ExitCode == 0, "Successful child completion publishes results.");
+    var arguments = File.ReadAllLines(Path.Combine(root, "output", "complete", "started.txt"));
+    Check(arguments[Array.IndexOf(arguments, "--max-resolution") + 1] == "640"
+        && arguments[Array.IndexOf(arguments, "--max-splats") + 1] == "12345", "Optional resolution and splat cap reach the actual child process.");
     var result = done.Result!;
     var preview = BrushLogPreview.Create(result.Log, result.ExportPath);
     Check(preview.Length < 6400 && preview.Contains("FINAL TRAINING SUMMARY") && preview.Contains("brush-training.log"),
@@ -101,6 +104,11 @@ using (var session = new BrushTrainingSession())
     Check(done.Result?.Succeeded == false && done.Result.ExitCode == 7, "A new Run edge starts the next job and preserves failure exit codes.");
 }
 var disposeRequest = request with { JobName = "dispose" };
+foreach (var invalid in new[] { (0, 1000), (640, 0), (-1, 1000), (640, -1) })
+{
+    var rejected = await BrushTrainingRunner.RunAsync(executable, dataset, root, "complete", 1, false, false, true, false, default, invalid.Item1, invalid.Item2);
+    Check(!rejected.Succeeded && File.Exists(Path.Combine(root, "output", "complete", "checkpoint.ply")), "Invalid Brush limits do not delete existing exports.");
+}
 var disposal = new BrushTrainingSession();
 disposal.Update(disposeRequest, true, false);
 var disposalMarker = Path.Combine(root, "output", "dispose", "started.txt");

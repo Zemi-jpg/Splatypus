@@ -71,6 +71,18 @@ Check(!Directory.Exists(project) && before.SequenceEqual(Directory.GetFiles(test
 var actual = await FFmpegMediaImporter.RunAsync(ffmpeg, project, inputs, 2, false, false, default);
 Check(actual.Succeeded && actual.ImportedImages.Count == result.EstimatedImages,
     "Estimate matches real FFmpeg extraction for fractional-duration fixtures. " + actual.Status);
+var videoGroups = VideoFrameReader.Read(project, Array.Empty<string>(), -1, out var videoWarning);
+Check(videoGroups.Count == 2 && videoGroups.Sum(v => v.Frames.Count) == actual.ImportedImages.Count - 1 && videoWarning == "",
+    "Real FFmpeg import persists provenance and excludes the still image from video groups.");
+Check(videoGroups.All(v => v.FramesPerSecond == 2 && v.Frames[0].Time == 0), "Imported video groups preserve extraction timing.");
+var replacementProject = Path.Combine(testRoot, "replacement provenance");
+Check((await FFmpegMediaImporter.RunAsync(ffmpeg, replacementProject, new[] { clip, still }, 2, false, false, default)).Succeeded,
+    "Replacement provenance fixture imports successfully.");
+Check((await FFmpegMediaImporter.RunAsync(ffmpeg, replacementProject, new[] { shortClip }, 4, true, false, default)).Succeeded,
+    "Replacement import succeeds with a new video and FPS.");
+var replacedVideos = VideoFrameReader.Read(replacementProject, Array.Empty<string>(), 2, out _);
+Check(replacedVideos.Count == 1 && replacedVideos[0].Source == shortClip && replacedVideos[0].FramesPerSecond == 4,
+    "Replacing media replaces video identities and timing without retaining stale groups.");
 var higher = await estimator.EstimateAsync(ffmpeg, project, inputs, 4, default);
 Check(higher.EstimatedImages == 13, "FPS changes recalculate the expected JPEG count.");
 var actualHigher = await FFmpegMediaImporter.RunAsync(ffmpeg, Path.Combine(testRoot, "higher fps"), inputs, 4, false, false, default);
@@ -103,6 +115,41 @@ Check((await estimator.EstimateAsync(ffmpeg, project, new[] { audio }, 2, defaul
     "Audio-only files are rejected even when container duration is known.");
 Check(!(await estimator.EstimateAsync(ffmpeg, project, new[] { Path.Combine(testRoot, "absent.mp4") }, 2, default)).EstimatedImages.HasValue,
     "Missing sources invalidate the estimate.");
+
+// Exercise the 0.1.1 options with the real pinned FFmpeg binary.
+var transparent = Path.Combine(testRoot, "alpha.png");
+await RunFfmpeg("-f", "lavfi", "-i", "color=c=red@0.25:s=64x64,format=rgba", "-frames:v", "1", transparent);
+var pngProject = Path.Combine(testRoot, "PNG alpha import");
+var pngImport = await FFmpegMediaImporter.RunAsync(ffmpeg, pngProject, new[] { transparent, clip }, 4, false, false, default, MediaImageFormat.Png);
+Check(pngImport.Succeeded && pngImport.ImportedImages.All(path => path.EndsWith(".png")), "PNG option applies to still images and real video extraction. " + pngImport.Status);
+Check(File.ReadAllBytes(transparent).SequenceEqual(File.ReadAllBytes(pngImport.ImportedImages[0])), "Existing PNG alpha and metadata survive import byte-for-byte.");
+var alphaRaw = Path.Combine(testRoot, "alpha.raw");
+await RunFfmpeg("-i", pngImport.ImportedImages[0], "-vf", "alphaextract", "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "gray", alphaRaw);
+Check(File.ReadAllBytes(alphaRaw).All(value => value == 63), "Imported PNG retains a non-opaque alpha channel.");
+Check(VideoFrameReader.Read(pngProject, Array.Empty<string>(), out _).Single().Frames.Count == 9, "Video Frames reads PNG sequences and excludes PNG photographs.");
+var alphaVideo = Path.Combine(testRoot, "alpha.mov");
+await RunFfmpeg("-f", "lavfi", "-i", "color=c=red@0.25:s=64x64:r=4:d=1,format=rgba", "-c:v", "qtrle", "-pix_fmt", "argb", alphaVideo);
+var alphaVideoImport = await FFmpegMediaImporter.RunAsync(ffmpeg, Path.Combine(testRoot, "alpha video import"), new[] { alphaVideo }, 4, false, false, default, MediaImageFormat.Png);
+Check(alphaVideoImport.Succeeded, "Video with alpha can be imported to PNG. " + alphaVideoImport.Status);
+var videoAlphaRaw = Path.Combine(testRoot, "video-alpha.raw");
+await RunFfmpeg("-i", alphaVideoImport.ImportedImages[0], "-vf", "alphaextract", "-frames:v", "1", "-f", "rawvideo", "-pix_fmt", "gray", videoAlphaRaw);
+Check(File.ReadAllBytes(videoAlphaRaw).All(value => value == 63), "Actual video-to-PNG conversion preserves existing alpha.");
+var duplicateClip = Path.Combine(testRoot, "duplicate runs.mp4");
+await RunFfmpeg("-f", "lavfi", "-i", "color=c=red:s=64x64:r=4:d=1", "-f", "lavfi", "-i", "color=c=blue:s=64x64:r=4:d=1", "-filter_complex", "[0:v][1:v]concat=n=2:v=1:a=0", "-c:v", "mpeg4", duplicateClip);
+foreach (var format in new[] { MediaImageFormat.Jpeg, MediaImageFormat.Png })
+{
+    var selectedRoot = Path.Combine(testRoot, "deduplicated " + format);
+    var selected = await FFmpegMediaImporter.RunAsync(ffmpeg, selectedRoot, new[] { duplicateClip, transparent }, 4, false, false, default, format, true);
+    Check(selected.Succeeded && selected.ImportedImages.Count == 3, "Duplicate removal retains two different video frames and one still in " + format + ". " + selected.Status);
+    var frames = VideoFrameReader.Read(selectedRoot, Array.Empty<string>(), out _).Single().Frames;
+    Check(frames.Select(frame => frame.Time).SequenceEqual(new[] { 0.0, 1.0 }), "Skipped frames preserve original video timing in " + format + ".");
+    var userPng = Path.Combine(selectedRoot, "images", "user.png"); File.Copy(transparent, userPng);
+    var replaced = await FFmpegMediaImporter.RunAsync(ffmpeg, selectedRoot, new[] { clip }, 2, true, false, default, format == MediaImageFormat.Png ? MediaImageFormat.Jpeg : MediaImageFormat.Png);
+    Check(replaced.Succeeded && File.Exists(userPng) && selected.ImportedImages.All(path => !File.Exists(path)), "Changing image format replaces only managed images and retains user files.");
+}
+var invalidRoot = Path.Combine(testRoot, "invalid format");
+Check(!(await FFmpegMediaImporter.RunAsync(ffmpeg, invalidRoot, new[] { clip }, 2, true, false, default, (MediaImageFormat)9)).Succeeded
+    && !Directory.Exists(invalidRoot), "Invalid image format is rejected before project mutation.");
 
 var fakeTools = Path.Combine(testRoot, "probe tools");
 Directory.CreateDirectory(fakeTools);
@@ -212,7 +259,7 @@ using (var session = new FFmpegMediaImportSession())
     Check(!Directory.Exists(request.ProjectRoot), "Background estimates still create no project files.");
 }
 
-var slowImage = Path.Combine(testRoot, "slow-image.jpg");
+var slowImage = Path.Combine(testRoot, "slow-image.bmp");
 File.WriteAllText(slowImage, "test still image; fake FFmpeg deliberately stalls");
 var mutableSources = new[] { slowImage };
 request = new FFmpegMediaRequest(fakeFfmpeg, Path.Combine(testRoot, "background cancellation"),

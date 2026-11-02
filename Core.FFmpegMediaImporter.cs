@@ -6,8 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace RhinoSplat.Core;
+
+public enum MediaImageFormat { Jpeg = 0, Png = 1 }
 
 public sealed record FFmpegMediaImportResult(
     bool Succeeded,
@@ -21,8 +24,11 @@ public static class FFmpegMediaImporter
 {
     private const string ManagedPrefix = "sp_media_";
     private static IEnumerable<string> ManagedImages(string imagesPath) =>
-        Directory.EnumerateFiles(imagesPath, ManagedPrefix + "*.jpg", SearchOption.TopDirectoryOnly)
-            .Concat(Directory.EnumerateFiles(imagesPath, "rs_media_*.jpg", SearchOption.TopDirectoryOnly));
+        Directory.EnumerateFiles(imagesPath, "*", SearchOption.TopDirectoryOnly)
+            .Where(path => (Path.GetFileName(path).StartsWith(ManagedPrefix, StringComparison.OrdinalIgnoreCase)
+                || Path.GetFileName(path).StartsWith("rs_media_", StringComparison.OrdinalIgnoreCase))
+                && (Path.GetExtension(path).Equals(".jpg", StringComparison.OrdinalIgnoreCase)
+                    || Path.GetExtension(path).Equals(".png", StringComparison.OrdinalIgnoreCase)));
     private static readonly HashSet<string> ImageExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp", ".heic", ".heif", ".avif", ".gif"
@@ -39,15 +45,18 @@ public static class FFmpegMediaImporter
         double framesPerSecond,
         bool replaceExisting,
         bool showTerminal,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        MediaImageFormat imageFormat = MediaImageFormat.Jpeg,
+        bool skipNearDuplicates = false)
     {
         var imagesPath = string.Empty;
         try
         {
             if (!string.IsNullOrWhiteSpace(projectRoot))
                 imagesPath = Path.Combine(Path.GetFullPath(projectRoot), "images");
+            if (!Enum.IsDefined(imageFormat)) return Failure(imagesPath, "Image Format must be 0 (JPEG) or 1 (PNG).");
             using var lease = DatasetLease.Acquire(projectRoot);
-            return await RunCoreAsync(executable, projectRoot, sources, framesPerSecond, replaceExisting, showTerminal, cancellationToken).ConfigureAwait(false);
+            return await RunCoreAsync(executable, projectRoot, sources, framesPerSecond, replaceExisting, showTerminal, cancellationToken, imageFormat, skipNearDuplicates).ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -66,7 +75,7 @@ public static class FFmpegMediaImporter
         double framesPerSecond,
         bool replaceExisting,
         bool showTerminal,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken, MediaImageFormat imageFormat, bool skipNearDuplicates)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (string.IsNullOrWhiteSpace(projectRoot))
@@ -78,6 +87,9 @@ public static class FFmpegMediaImporter
             return Failure(imagesPath, validation.Message);
         if (double.IsNaN(framesPerSecond) || double.IsInfinity(framesPerSecond) || framesPerSecond <= 0.0)
             return Failure(imagesPath, "Frames Per Second must be greater than zero.");
+        framesPerSecond = double.Parse(FormatFramesPerSecond(framesPerSecond), CultureInfo.InvariantCulture);
+        if (framesPerSecond <= 0)
+            return Failure(imagesPath, "Frames Per Second is below FFmpeg's supported extraction precision (0.000001).");
 
         var sourceFiles = ExpandSources(sources, imagesPath, out var sourceError, cancellationToken);
         if (sourceError is not null)
@@ -104,8 +116,17 @@ public static class FFmpegMediaImporter
                 (null, Path.Combine(dataset.Colmap, "database.db")),
                 (null, Path.Combine(dataset.Colmap, "database.db-wal")),
                 (null, Path.Combine(dataset.Colmap, "database.db-shm")));
+        dataset.CheckOwnedPath(Path.Combine(root, MediaImportManifest.FileName));
+        File.Delete(Path.Combine(root, MediaImportManifest.FileName));
         Directory.CreateDirectory(imagesPath);
         if (replaceExisting) DeleteManagedImages(imagesPath, cancellationToken);
+
+        var mediaSources = sourceFiles.Select((source, index) => new MediaSourceRecord(source,
+            $"{ManagedPrefix}{index + 1:D4}_{SanitizeFileStem(Path.GetFileNameWithoutExtension(source))}", !IsStillImage(source))).ToArray();
+        // Record provenance before extraction so cancelled/partial imports remain identifiable.
+        void SaveManifest() => new MediaImportManifest(1, framesPerSecond, mediaSources)
+            { SkipNearDuplicates = skipNearDuplicates }.Save(root);
+        SaveManifest();
 
         var logPath = Path.Combine(root, "ffmpeg-import.log");
         ColmapLiveLog.Create(logPath);
@@ -114,21 +135,41 @@ public static class FFmpegMediaImporter
 
         var imported = new List<string>();
         var log = new List<string>();
+        var extension = imageFormat == MediaImageFormat.Png ? ".png" : ".jpg";
         for (var index = 0; index < sourceFiles.Count; index++)
         {
             if (cancellationToken.IsCancellationRequested)
                 return new FFmpegMediaImportResult(false, true, imagesPath, imported, JoinLog(log), "FFmpeg media import was cancelled.");
             var source = sourceFiles[index];
-            var stem = SanitizeFileStem(Path.GetFileNameWithoutExtension(source));
-            var prefix = $"{ManagedPrefix}{index + 1:D4}_{stem}";
+            var prefix = mediaSources[index].Prefix;
             var isImage = IsStillImage(source);
             var output = isImage
-                ? Path.Combine(imagesPath, prefix + ".jpg")
-                : Path.Combine(imagesPath, prefix + "_%06d.jpg");
+                ? Path.Combine(imagesPath, prefix + extension)
+                : Path.Combine(imagesPath, prefix + "_%06d" + extension);
 
-            var arguments = BuildArguments(source, output, isImage, framesPerSecond);
+            // Keep original alpha, calibration and EXIF GPS when no format conversion is needed.
+            var sourceExtension = Path.GetExtension(source);
+            if (isImage && (sourceExtension.Equals(extension, StringComparison.OrdinalIgnoreCase)
+                || (imageFormat == MediaImageFormat.Jpeg && sourceExtension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase))))
+            {
+                File.Copy(source, output, false);
+                imported.Add(output);
+                var message = $"Preserved original {Path.GetFileName(source)} as {Path.GetFileName(output)}.";
+                log.Add(message); ColmapLiveLog.AppendLine(logPath, message);
+                continue;
+            }
+            var arguments = BuildArguments(source, output, isImage, framesPerSecond, imageFormat, skipNearDuplicates);
             var processResult = await RunProcessAsync(validation.ExecutablePath, executableDirectory, arguments, logPath, cancellationToken).ConfigureAwait(false);
             log.Add($"{Path.GetFileName(source)}:{Environment.NewLine}{processResult.Log}");
+            if (!isImage && skipNearDuplicates)
+            {
+                // fps establishes a 1/FPS time base. Use integer PTS rather than showinfo's
+                // rounded pts_time display, which loses precision in long/high-FPS captures.
+                var times = Regex.Matches(processResult.Log, @"\bpts:\s*(?<pts>-?\d+)\s+pts_time:")
+                    .Select(match => long.Parse(match.Groups["pts"].Value, CultureInfo.InvariantCulture) / framesPerSecond).ToArray();
+                mediaSources[index] = mediaSources[index] with { FrameTimes = times };
+                SaveManifest(); // Partial/cancelled imports retain timestamps for frames already written.
+            }
             if (processResult.WasCancelled)
                 return new FFmpegMediaImportResult(false, true, imagesPath, imported, JoinLog(log), "FFmpeg media import was cancelled.");
             if (!processResult.Succeeded)
@@ -136,13 +177,16 @@ public static class FFmpegMediaImporter
 
             var created = isImage
                 ? (File.Exists(output) ? new[] { output } : Array.Empty<string>())
-                : Directory.EnumerateFiles(imagesPath, prefix + "_*.jpg", SearchOption.TopDirectoryOnly).OrderBy(path => path, StringComparer.OrdinalIgnoreCase).ToArray();
+                : Directory.EnumerateFiles(imagesPath, prefix + "_*" + extension, SearchOption.TopDirectoryOnly).OrderBy(path => path, StringComparer.OrdinalIgnoreCase).ToArray();
             if (!created.Any())
                 return new FFmpegMediaImportResult(false, false, imagesPath, imported, JoinLog(log), $"FFmpeg completed but produced no frames for {Path.GetFileName(source)}.");
             imported.AddRange(created);
+            if (!isImage && skipNearDuplicates && mediaSources[index].FrameTimes?.Length != created.Length)
+                return new(false, false, imagesPath, imported, JoinLog(log), "Could not recover timestamps for every selected frame; inspect the FFmpeg log.");
         }
 
-        return new FFmpegMediaImportResult(true, false, imagesPath, imported, JoinLog(log), $"Imported {imported.Count:N0} JPEG image(s) from {sourceFiles.Count:N0} media source(s).");
+        return new FFmpegMediaImportResult(true, false, imagesPath, imported, JoinLog(log), $"Imported {imported.Count:N0} {(imageFormat == MediaImageFormat.Png ? "PNG" : "JPEG")} image(s) from {sourceFiles.Count:N0} media source(s)."
+            + (skipNearDuplicates ? " Near-duplicate video frames were skipped; source timing is preserved." : ""));
     }
 
     internal static IReadOnlyList<string> ExpandSources(IReadOnlyList<string> sources, string imagesPath, out string? error, CancellationToken cancellationToken = default)
@@ -188,18 +232,23 @@ public static class FFmpegMediaImporter
         ImageExtensions.Contains(Path.GetExtension(file)) || VideoExtensions.Contains(Path.GetExtension(file));
 
     internal static bool IsStillImage(string file) => ImageExtensions.Contains(Path.GetExtension(file));
+    internal static bool IsVideo(string file) => VideoExtensions.Contains(Path.GetExtension(file));
 
     internal static string FormatFramesPerSecond(double framesPerSecond) =>
         framesPerSecond.ToString("0.######", CultureInfo.InvariantCulture);
 
-    private static IReadOnlyList<string> BuildArguments(string source, string output, bool isImage, double framesPerSecond)
+    private static IReadOnlyList<string> BuildArguments(string source, string output, bool isImage, double framesPerSecond,
+        MediaImageFormat imageFormat, bool skipNearDuplicates)
     {
         var arguments = new List<string> { "-hide_banner", "-nostdin", "-n", "-i", source, "-map", "0:v:0" };
         if (isImage)
             arguments.AddRange(new[] { "-frames:v", "1", "-update", "1" });
         else
-            arguments.AddRange(new[] { "-vf", "fps=" + FormatFramesPerSecond(framesPerSecond), "-start_number", "1" });
-        arguments.AddRange(new[] { "-q:v", "2", output });
+            arguments.AddRange(new[] { "-vf", "fps=" + FormatFramesPerSecond(framesPerSecond)
+                + (skipNearDuplicates ? ",mpdecimate,showinfo" : ""), "-fps_mode", "vfr", "-start_number", "1" });
+        if (imageFormat == MediaImageFormat.Jpeg) arguments.AddRange(new[] { "-q:v", "2" });
+        else arguments.AddRange(new[] { "-c:v", "png" });
+        arguments.Add(output);
         return arguments;
     }
 
@@ -245,7 +294,7 @@ public static class FFmpegMediaImporter
         }
     }
 
-    private static string SanitizeFileStem(string value)
+    internal static string SanitizeFileStem(string value)
     {
         var invalid = Path.GetInvalidFileNameChars();
         var safe = new string(value.Select(character => invalid.Contains(character) ? '_' : character).ToArray()).Trim();

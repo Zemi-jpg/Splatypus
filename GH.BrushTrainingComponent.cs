@@ -18,9 +18,18 @@ public sealed class BrushTrainingComponent : SpComponent
     private readonly HashSet<int> _runMustReset = new();
     private readonly Dictionary<int, (BrushRunResult Result, string Text)> _logPreviews = new();
     private bool _publicationQueued;
+    private bool _resetSavedRun;
 
     public BrushTrainingComponent()
         : base("SP Brush Train", "Brush Train", "Trains with Brush outside Grasshopper's solution so you can keep working. Press Cancel to stop.", "Splatypus", "05 Training") { }
+
+    public override bool Read(GH_IO.Serialization.GH_IReader reader)
+    {
+        var missing = AppendedInputs.BeforeRead(this, reader, "Maximum Training Resolution", "Maximum Splat Count");
+        var result = base.Read(reader); AppendedInputs.AfterRead(this, missing);
+        _resetSavedRun = true;
+        return result;
+    }
 
     protected override void RegisterInputParams(GH_InputParamManager p)
     {
@@ -35,6 +44,8 @@ public sealed class BrushTrainingComponent : SpComponent
         p.AddBooleanParameter("Show Terminal", "Terminal", "When True, opens a terminal window with Brush's live log.", GH_ParamAccess.item, false);
         p.AddBooleanParameter("Rotate for Visualization", "Rotate for Visualization", "When True, creates an additional _rgs.ply rotated +90 degrees around X for RhinoGaussianSplatting. The original Brush PLY is unchanged. Both files are in Export.", GH_ParamAccess.item, false);
         p.AddBooleanParameter("Cancel", "Cancel", "Stops the current training process. Previously exported PLY files remain. A Button is recommended.", GH_ParamAccess.item, false);
+        p.AddIntegerParameter("Maximum Training Resolution", "Resolution", "Longest image side loaded by Brush. Default 1920. Lower values reduce workload; larger values may require more GPU memory.", GH_ParamAccess.item, 1920);
+        p.AddIntegerParameter("Maximum Splat Count", "Max Splats", "Upper bound on splats, not a target or a guaranteed memory limit. Default 10000000.", GH_ParamAccess.item, 10000000);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager p)
@@ -66,12 +77,15 @@ public sealed class BrushTrainingComponent : SpComponent
         da.GetData(0, ref exe); da.GetData(1, ref dataset); da.GetData(2, ref root); da.GetData(6, ref run);
         da.GetData(3, ref name); da.GetData(4, ref steps); da.GetData(5, ref viewer); da.GetData(7, ref replace);
         da.GetData(8, ref terminal); da.GetData(9, ref rotateForVisualization); da.GetData(10, ref cancel);
+        var resolution = 1920; var maxSplats = 10000000;
+        da.GetData(11, ref resolution); da.GetData(12, ref maxSplats);
+        if (_resetSavedRun) _runMustReset.Add(da.Iteration);
         if (_runMustReset.Contains(da.Iteration))
         {
             if (!run) _runMustReset.Remove(da.Iteration);
             run = false;
         }
-        var input = new BrushTrainingRequest(exe, dataset, root, name, steps, viewer, terminal, replace, rotateForVisualization);
+        var input = new BrushTrainingRequest(exe, dataset, root, name, steps, viewer, terminal, replace, rotateForVisualization, resolution, maxSplats);
         var state = session.Update(input, run, cancel);
         if (state.IsTraining)
         {
@@ -111,6 +125,7 @@ public sealed class BrushTrainingComponent : SpComponent
     protected override void AfterSolveInstance()
     {
         base.AfterSolveInstance();
+        _resetSavedRun = false;
         foreach (var iteration in _sessions.Keys.Where(key => !_activeIterations.Contains(key)).ToArray())
         {
             _sessions[iteration].Dispose();
@@ -157,7 +172,7 @@ public sealed class BrushTrainingComponent : SpComponent
         base.DocumentContextChanged(document, context);
     }
 
-    public override GH_Exposure Exposure => GH_Exposure.tertiary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
 
     public override Guid ComponentGuid => new("B8F6F6B3-CEAF-4C45-91D1-DF718C384154");
 }

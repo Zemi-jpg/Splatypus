@@ -108,6 +108,6 @@ public sealed class DownloadToolsComponent : SpComponent
         if (context is GH_DocumentContext.Close or GH_DocumentContext.Unloaded) Stop();
         base.DocumentContextChanged(document, context);
     }
-    public override GH_Exposure Exposure => GH_Exposure.tertiary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
     public override Guid ComponentGuid => new("DF84C5D0-635E-4F25-9465-46BC8A2A9756");
 }

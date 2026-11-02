@@ -1,4 +1,6 @@
-# Live JPEG estimate
+# Live image estimate
+
+0.2.0 adds JPEG/PNG selection and optional near-duplicate video filtering. Output labels are now Imported Images and Estimated Images, retaining their indices. Estimate reports the count before filtering; actual output may be lower. Surviving-frame timestamps preserve playback timing. See [0.2.0 options](Version-0.2.0-options.md).
 
 `SP Media Import` now appends two outputs to its existing outputs:
 

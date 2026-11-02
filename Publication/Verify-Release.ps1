@@ -6,14 +6,26 @@ $inventory = Get-Content -LiteralPath (Join-Path $folder 'release-inventory.json
 $expected = @('Splatypus.gha', 'Splatypus.Core.dll', 'README.md', 'Splatypus-Quick-Start.pdf',
     'icon.png', 'LICENSE.txt', 'NOTICE.txt', 'manifest.yml', 'Examples/Splatypus_Workflow.gh')
 Add-Type -AssemblyName System.IO.Compression
+$hashedNames = [Collections.Generic.List[string]]::new()
 foreach ($line in Get-Content -LiteralPath (Join-Path $folder 'SHA256SUMS.txt')) {
     if ($line -notmatch '^([a-f0-9]{64})  ([^/\\]+)$') { throw "Invalid hash record: $line" }
     $hash = $Matches[1]; $name = $Matches[2]
+    $hashedNames.Add($name)
     if ((Get-FileHash -LiteralPath (Join-Path $folder $name) -Algorithm SHA256).Hash.ToLowerInvariant() -ne $hash) { throw "Hash mismatch: $name" }
 }
+$artifactNames = @($inventory.artifacts | ForEach-Object { $_.yak; $_.zip })
+if (@(Compare-Object ($artifactNames | Sort-Object) ($hashedNames | Sort-Object)).Count) { throw 'Checksum list must cover every release archive exactly once.' }
 foreach ($record in $inventory.artifacts) {
     $tag = if ($record.platform -eq 'windows') { 'win' } elseif ($record.platform -eq 'macos') { 'mac' } else { throw 'Unknown platform.' }
     if ($record.yak -notmatch ('(?i)^splatypus-' + [regex]::Escape($inventory.version) + '-rh8_34-' + $tag + '\.yak$')) { throw 'Incorrect Rhino/platform distribution tag.' }
+    $baseline = Join-Path $folder "Splatypus-0.1.0-$($record.platform).zip"
+    if ($inventory.version -ne '0.1.0' -and (Test-Path -LiteralPath $baseline)) {
+        $baselineArchive = [IO.Compression.ZipFile]::OpenRead($baseline)
+        try {
+            $baselineFiles = @($baselineArchive.Entries | Where-Object { $_.Name.Length -gt 0 } | ForEach-Object { $_.FullName.Replace('\', '/') })
+            if (@(Compare-Object ($expected | Sort-Object) ($baselineFiles | Sort-Object)).Count) { throw 'Release layout differs from the 0.1.0 package.' }
+        } finally { $baselineArchive.Dispose() }
+    }
     $payloads = @{}
     foreach ($name in @($record.yak, $record.zip)) {
         $archive = [IO.Compression.ZipFile]::OpenRead((Join-Path $folder $name))
@@ -34,6 +46,15 @@ foreach ($record in $inventory.artifacts) {
                 if ($hashMap[$entryName] -ne $sourceHash) { throw "$name contains a stale example: $example" }
             }
             $payloads[$name] = $hashMap
+            if ($inventory.example -and $hashMap[$inventory.example.path].ToLowerInvariant() -ne $inventory.example.sha256) { throw "$name does not match the recorded SP_020 template hash." }
+            $reader = [IO.StreamReader]::new($archive.GetEntry('README.md').Open())
+            try { $readme = $reader.ReadToEnd() } finally { $reader.Dispose() }
+            foreach ($link in [regex]::Matches($readme, '\[[^\]]+\]\(([^)]+)\)')) {
+                $target = $link.Groups[1].Value
+                if ($target -match '^[a-zA-Z][a-zA-Z0-9+.-]*:|^#') { continue }
+                $target = ($target -split '#')[0]
+                if ($target -notin $actual) { throw "$name README links to an unpackaged file: $target" }
+            }
             $manifestEntry = $archive.GetEntry('manifest.yml')
             $reader = [IO.StreamReader]::new($manifestEntry.Open())
             try { $manifest = $reader.ReadToEnd() } finally { $reader.Dispose() }
@@ -61,8 +82,8 @@ foreach ($record in $inventory.artifacts) {
                             if ($tag -eq 'mac' -and $references.ContainsKey('System.Windows.Forms')) { throw 'Mac build depends on Windows Forms.' }
                             if (!$references.ContainsKey('Splatypus.Core')) { throw 'Core library reference missing.' }
                             if ($references['Splatypus.Core'] -ne $record.assemblyVersion) { throw 'GHA/Core library version mismatch.' }
-                            if (@($metadata.ManifestResources).Count -ne 21) { throw 'Expected 21 embedded component icons.' }
                             $expectedIcons = @(Get-Content -LiteralPath (Join-Path $PSScriptRoot 'assets/component-inventory.json') -Raw | ConvertFrom-Json | ForEach-Object { "RhinoSplat.Icons.$($_.id).png" })
+                            if (@($metadata.ManifestResources).Count -ne $expectedIcons.Count) { throw "Expected $($expectedIcons.Count) embedded component icons." }
                             $actualIcons = @($metadata.ManifestResources | ForEach-Object { $metadata.GetString($metadata.GetManifestResource($_).Name) })
                             if (@(Compare-Object ($expectedIcons | Sort-Object) ($actualIcons | Sort-Object)).Count) { throw 'Embedded icons do not match the current component inventory.' }
                         }

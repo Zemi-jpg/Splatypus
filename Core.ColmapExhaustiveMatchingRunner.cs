@@ -13,7 +13,7 @@ public static class ColmapExhaustiveMatchingRunner
         string executable,
         string projectRoot,
         bool showTerminal,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken, ColmapMatchingMode matching = ColmapMatchingMode.Exhaustive)
     {
         using var lease = DatasetLease.Acquire(projectRoot);
         cancellationToken.ThrowIfCancellationRequested();
@@ -25,15 +25,21 @@ public static class ColmapExhaustiveMatchingRunner
             return new ColmapRunResult(false, false, null, database, string.Empty, validation.Message);
         if (!File.Exists(database))
             return new ColmapRunResult(false, false, null, database, string.Empty, "COLMAP database was not found. Complete feature extraction first.");
+        ColmapMatchingDecision decision;
+        try { decision = ColmapMatching.Resolve(matching, root); }
+        catch (ArgumentException error) { return new(false, false, null, database, string.Empty, error.Message); }
+        var mode = decision.Mode.ToString().ToLowerInvariant();
+        var selection = $"Matching: {decision.Mode}. {decision.Reason}";
 
         var executableDirectory = Path.GetDirectoryName(validation.ExecutablePath);
         if (string.IsNullOrWhiteSpace(executableDirectory))
             return new ColmapRunResult(false, false, null, database, string.Empty, "Could not determine COLMAP's installation folder.");
 
-        var logPath = Path.Combine(root, "colmap", "exhaustive-matching.log");
+        var logPath = Path.Combine(root, "colmap", mode + "-matching.log");
         ColmapLiveLog.Create(logPath);
+        ColmapLiveLog.AppendLine(logPath, selection);
         if (showTerminal)
-            ColmapLiveLog.OpenTerminal(logPath, "Splatypus — COLMAP exhaustive matching");
+            ColmapLiveLog.OpenTerminal(logPath, "Splatypus — COLMAP " + mode + " matching");
 
         var startInfo = new ProcessStartInfo
         {
@@ -45,7 +51,7 @@ public static class ColmapExhaustiveMatchingRunner
             CreateNoWindow = true
         };
         startInfo.Environment["PATH"] = executableDirectory + Path.PathSeparator + (Environment.GetEnvironmentVariable("PATH") ?? string.Empty);
-        startInfo.ArgumentList.Add("exhaustive_matcher");
+        startInfo.ArgumentList.Add(mode + "_matcher");
         startInfo.ArgumentList.Add("--database_path");
         startInfo.ArgumentList.Add(database);
 
@@ -60,14 +66,14 @@ public static class ColmapExhaustiveMatchingRunner
             await process.WaitForExitAsync().ConfigureAwait(false);
             var stdout = await stdoutTask.ConfigureAwait(false);
             var stderr = await stderrTask.ConfigureAwait(false);
-            var log = string.Join(Environment.NewLine, new[] { stdout, stderr }.Where(text => !string.IsNullOrWhiteSpace(text)));
+            var log = string.Join(Environment.NewLine, new[] { selection, stdout, stderr }.Where(text => !string.IsNullOrWhiteSpace(text)));
 
             if (cancellationToken.IsCancellationRequested)
-                return new ColmapRunResult(false, true, null, database, log, "COLMAP exhaustive matching was cancelled.");
+                return new ColmapRunResult(false, true, null, database, log, $"COLMAP {mode} matching was cancelled.");
 
             var succeeded = process.ExitCode == 0;
             return new ColmapRunResult(succeeded, false, process.ExitCode, database, log,
-                succeeded ? "COLMAP exhaustive matching completed." : "COLMAP exhaustive matching failed; inspect the log.");
+                succeeded ? $"COLMAP {mode} matching completed. {decision.Reason}" : $"COLMAP {mode} matching failed; inspect the log.");
         }
         catch (Exception exception)
         {

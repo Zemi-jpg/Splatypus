@@ -70,6 +70,7 @@ public static class ColmapModelTransformRunner
                 "model_converter", "--input_path", text, "--output_path", Path.Combine(sparse, "0"), "--output_type", "BIN");
             ActiveDataset.ValidatePair(dataset.Images, Path.Combine(sparse, "0"));
             ActiveDataset.ValidateText(text, dataset.Images);
+            File.WriteAllText(Path.Combine(text, VideoModelSelection.RevisionFile), VideoModelSelection.Revision(dataset.Root));
             transaction.Commit(cancellationToken, (sparse, Path.GetDirectoryName(sparsePath)!), (text, textPath));
             return new(true, false, textPath, sparsePath, log, "Separate aligned model saved. Every Write transforms the active base model; connect Aligned Sparse Model to Brush's optional model input.");
         }

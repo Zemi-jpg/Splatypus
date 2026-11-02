@@ -60,7 +60,7 @@ public sealed class ProjectComponent : SpComponent
         }
     }
 
-    public override GH_Exposure Exposure => GH_Exposure.secondary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
 
     public override Guid ComponentGuid => new("E815BB83-F5FE-4A44-A95D-4C8DF2B7E96A");
 }

@@ -112,6 +112,8 @@ async function main(){
  await saveSheet('plan-a-vs-b',comparison+'</svg>');
  fs.writeFileSync(path.join(root,'review','index.html'),`<!doctype html><html lang="en"><meta charset="utf-8"><title>Splatypus / Plan B</title><style>body{margin:0;background:#F5F4F0;font-family:Segoe UI,Arial}nav{padding:20px;text-align:center}a{color:#287681;margin:0 20px}img{display:block;width:100%;max-width:1440px;height:auto;margin:auto}</style><nav><a href="#b">Splatypus set</a><a href="#compare">Compare with Plan A</a></nav><img id="b" src="splatypus-components.svg" alt="Splatypus icons"><img id="compare" src="plan-a-vs-b.svg" alt="All twenty original and Splatypus icons side by side"></html>`);
  await require('./generate-pipeline.cjs')(sharp);
- console.log('Splatypus: 21 SVGs, 63 PNGs, brand mark, and review sheets. Plan A unchanged.');
+  await require('./generate-video.cjs')(sharp);
+  await require('./generate-quick-align.cjs')(sharp);
+ console.log('Splatypus: 21 current SVGs, 63 PNGs, brand mark, and review sheets. Plan A unchanged.');
 }
 main().catch(e=>{console.error(e);process.exit(1)});

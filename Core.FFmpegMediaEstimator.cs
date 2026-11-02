@@ -73,8 +73,8 @@ public sealed class FFmpegMediaEstimator
                 count += (int)frames;
             }
 
-            return new(count, false, $"Estimated output: {count:N0} JPEGs at {rateText} fps from {files.Count:N0} source(s). " +
-                "One JPEG per still image; video counts are approximate and may differ at clip boundaries.");
+            return new(count, false, $"Estimated output: {count:N0} images at {rateText} fps from {files.Count:N0} source(s). " +
+                "One image per still image; video counts are approximate and may differ at clip boundaries.");
         }
         catch (OperationCanceledException)
         {

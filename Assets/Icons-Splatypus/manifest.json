@@ -166,5 +166,45 @@
     "svg": "svg/colmap-pipeline.svg",
     "png": "png24/colmap-pipeline.png",
     "motif": "Front-facing platypus head formed from COLMAP aperture facets and a broad bill"
+  },
+  {
+    "id": "video-frames",
+    "label": "SP Video Frames",
+    "category": "06 / PREVIEW",
+    "svg": "svg/video-frames.svg",
+    "png": "png24/video-frames.png",
+    "motif": "Stacked image frames with recognizable mountains and sun"
+  },
+  {
+    "id": "video-playback",
+    "label": "SP Video Playback",
+    "category": "06 / PREVIEW",
+    "svg": "svg/video-playback.svg",
+    "png": "png24/video-playback.png",
+    "motif": "Filmstrip enclosing a swimming platypus with motion trails"
+  },
+  {
+    "id": "view-capture",
+    "label": "SP View Capture",
+    "category": "06 / PREVIEW",
+    "svg": "svg/view-capture.svg",
+    "png": "png24/view-capture.png",
+    "motif": "Viewfinder corners surrounding a camera with a circular lens"
+  },
+  {
+    "id": "auto-background",
+    "label": "SP Auto Background",
+    "category": "06 / PREVIEW",
+    "svg": "svg/auto-background.svg",
+    "png": "png24/auto-background.png",
+    "motif": "Baked splat colors over a sky-to-ground gradient"
+  },
+  {
+    "id": "quick-align",
+    "label": "SP Quick Align",
+    "category": "04 / REALIGNMENT",
+    "svg": "svg/quick-align.svg",
+    "png": "png24/quick-align.png",
+    "motif": "Rotated/scaled triangles with thin colored lines directly connecting matching red circles, blue squares and teal diamonds"
   }
 ]

@@ -1,7 +1,8 @@
 namespace RhinoSplat.Core;
 
 public sealed record BrushTrainingRequest(string Executable, string Dataset, string ProjectRoot,
-    string JobName, int TotalSteps, bool WithViewer, bool ShowTerminal, bool ReplaceExisting, bool RotateForVisualization);
+    string JobName, int TotalSteps, bool WithViewer, bool ShowTerminal, bool ReplaceExisting, bool RotateForVisualization,
+    int MaxResolution = 1920, int MaxSplats = 10000000);
 
 public sealed record BrushTrainingState(BrushRunResult? Result, bool IsTraining, bool IsCancelling);
 
@@ -46,7 +47,7 @@ public sealed class BrushTrainingSession : IDisposable
                 {
                     return await BrushTrainingRunner.RunAsync(input.Executable, input.Dataset, input.ProjectRoot,
                         input.JobName, input.TotalSteps, input.WithViewer, input.ShowTerminal, input.ReplaceExisting,
-                        input.RotateForVisualization, cancellation.Token).ConfigureAwait(false);
+                        input.RotateForVisualization, cancellation.Token, input.MaxResolution, input.MaxSplats).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {

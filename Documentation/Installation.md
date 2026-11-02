@@ -6,14 +6,14 @@ Use Rhino 8.34.26223.11001 or newer with Grasshopper and .NET 8. If Rhino is in 
 
 Windows x64 is the primary release target. A separate macOS package is available; automated build and archive checks do not establish native Mac workflow test coverage. The automatic Mac tool installer supports Apple Silicon only. Neither Windows ARM nor Intel Mac automatic tool installation is supported.
 
-## Rhino Package Manager
+## Download and install
 
-Run `_PackageManager` and search for Splatypus. If it is unavailable in your package catalog, use the [food4Rhino downloads](https://www.food4rhino.com/en/app/splatypus) or the [versioned GitHub packages](../dist/publication/).
+Download the ZIP or local Yak for your platform from [food4Rhino](https://www.food4rhino.com/en/app/splatypus) or [GitHub Releases](https://github.com/Zemi-jpg/Splatypus/releases). Version 0.2.0 is the current release; the original 0.1.0 installers remain available. GitHub releases and local Yak files do not by themselves register a package in the public Rhino Package Manager catalog.
 
 1. Back up saved Grasshopper definitions and project folders.
-2. Choose Package Manager or manual installation and keep one installed copy.
-3. Open Rhino and run `_PackageManager`. Search **Splatypus** and select version **0.1.0**.
-4. Select the compatible version, click Install, then restart Rhino.
+2. Choose local Yak or manual ZIP installation and keep one installed copy.
+3. Select **0.2.0** and the platform matching your machine.
+4. Follow the local installation steps below, then restart Rhino.
 5. Open Grasshopper and find the Splatypus tab. Place SP Hello and connect Status to a Panel. Expected output: `SP is loaded: Ready`.
 
 Package Manager installs the platform-specific plugin and Core library together. Download Tools is a separate user-triggered step; Package Manager does not install FFmpeg, COLMAP or Brush.

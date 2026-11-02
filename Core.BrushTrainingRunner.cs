@@ -11,7 +11,8 @@ public sealed record BrushRunResult(bool Succeeded, bool WasCancelled, int? Exit
 
 public static class BrushTrainingRunner
 {
-    public static async Task<BrushRunResult> RunAsync(string executable, string dataset, string projectRoot, string jobName, int totalSteps, bool withViewer, bool showTerminal, bool replaceExisting, bool rotateForVisualization, CancellationToken cancellationToken)
+    public static async Task<BrushRunResult> RunAsync(string executable, string dataset, string projectRoot, string jobName, int totalSteps, bool withViewer, bool showTerminal, bool replaceExisting, bool rotateForVisualization, CancellationToken cancellationToken,
+        int maxResolution = 1920, int maxSplats = 10000000)
     {
         cancellationToken.ThrowIfCancellationRequested();
         using var lease = DatasetLease.Acquire(projectRoot);
@@ -27,6 +28,8 @@ public static class BrushTrainingRunner
             return new BrushRunResult(false, false, null, exportPath, string.Empty, string.Empty, "Brush dataset is incomplete. Complete SP Brush Dataset first.");
         if (totalSteps <= 0)
             return new BrushRunResult(false, false, null, exportPath, string.Empty, string.Empty, "Total Steps must be greater than zero.");
+        if (maxResolution <= 0 || maxSplats <= 0)
+            return new(false, false, null, exportPath, string.Empty, string.Empty, "Maximum Training Resolution and Maximum Splat Count must be greater than zero.");
 
         if (Directory.Exists(exportPath) && Directory.EnumerateFileSystemEntries(exportPath).Any())
         {
@@ -53,6 +56,8 @@ public static class BrushTrainingRunner
         };
         info.ArgumentList.Add(fullDataset);
         info.ArgumentList.Add("--total-steps"); info.ArgumentList.Add(totalSteps.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        info.ArgumentList.Add("--max-resolution"); info.ArgumentList.Add(maxResolution.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        info.ArgumentList.Add("--max-splats"); info.ArgumentList.Add(maxSplats.ToString(System.Globalization.CultureInfo.InvariantCulture));
         info.ArgumentList.Add("--export-path"); info.ArgumentList.Add(exportPath);
         info.ArgumentList.Add("--export-name"); info.ArgumentList.Add("sp_{iter}.ply");
         if (withViewer) info.ArgumentList.Add("--with-viewer");

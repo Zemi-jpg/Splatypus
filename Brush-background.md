@@ -1,5 +1,7 @@
 # Background Brush training
 
+0.2.0 appends optional **Maximum Training Resolution** (default 1920) and **Maximum Splat Count** (default 10000000). These settings are captured when a job starts and validated before replacing existing exports. See [0.2.0 options](Version-0.2.0-options.md).
+
 SP Brush Train now runs its complete job outside Grasshopper's document solution. Press Run once and continue editing Rhino or the Grasshopper definition. Changing inputs during training affects the next run. Recomputes and a held Run toggle do not restart the job; additional Run presses while busy are ignored.
 
 The appended Cancel input stops the owned Brush process and retains checkpoints already exported. Use a Button. Removing the component or closing/unloading its document cancels its job. Reset Run to False before starting again after returning to a document.

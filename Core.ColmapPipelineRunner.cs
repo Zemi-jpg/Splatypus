@@ -5,7 +5,8 @@ namespace RhinoSplat.Core;
 
 public sealed record ColmapPipelineRequest(string Executable, string ProjectRoot,
     bool Extract = true, bool Match = true, bool Sparse = true, bool Undistort = false,
-    bool Export = true, bool ReplaceExisting = false, bool ShowTerminal = false);
+    bool Export = true, bool ReplaceExisting = false, bool ShowTerminal = false,
+    ColmapMatchingMode Matching = ColmapMatchingMode.Exhaustive, int MaxImageSize = 3200, int MaxNumFeatures = 8192);
 
 public sealed record ColmapPipelineProgress(int Completed, int Total, string Stage);
 
@@ -42,6 +43,9 @@ public static class ColmapPipelineRunner
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (request.Extract) new ColmapFeatureOptions(request.MaxImageSize, request.MaxNumFeatures).Validate();
+            if (request.Match && !Enum.IsDefined(request.Matching))
+                return Result(false, false, null, "Matching must be 0 Exhaustive, 1 Sequential, 2 Spatial or 3 Auto.");
             progress?.Invoke(new(0, total, "Setup"));
             var validation = ToolValidation.Colmap(request.Executable);
             if (!validation.IsValid) return Result(false, false, null, validation.Message);
@@ -84,8 +88,9 @@ public static class ColmapPipelineRunner
             var replace = request.ReplaceExisting;
             var stages = new (bool Enabled, string Name, Func<Task<ColmapRunResult>> Run)[]
             {
-                (request.Extract, "Feature extraction", () => ColmapFeatureExtractionRunner.RunAsync(exe, root, terminal, cancellationToken)),
-                (request.Match, "Exhaustive matching", () => ColmapExhaustiveMatchingRunner.RunAsync(exe, root, terminal, cancellationToken)),
+                (request.Extract, "Feature extraction", () => ColmapFeatureExtractionRunner.RunAsync(exe, root, terminal, cancellationToken,
+                    new(request.MaxImageSize, request.MaxNumFeatures))),
+                (request.Match, request.Matching + " matching", () => ColmapExhaustiveMatchingRunner.RunAsync(exe, root, terminal, cancellationToken, request.Matching)),
                 (request.Sparse, "Sparse reconstruction", () => ColmapSparseMapperRunner.RunAsync(exe, root, terminal, replace, cancellationToken)),
                 (request.Undistort, "Image undistortion", () => ColmapImageUndistorterRunner.RunAsync(exe, root, terminal, replace, cancellationToken)),
                 (request.Export, "Text export", () => ColmapModelExportRunner.RunAsync(exe, root, terminal, replace, cancellationToken))

@@ -17,7 +17,10 @@ public static class BrushDatasetPreparer
             var model = hasOverride ? Path.GetFullPath(sparseModelOverride!) : active.Sparse;
             ActiveDataset.EnsureWithin(model, active.Colmap);
             ActiveDataset.ValidatePair(active.Images, model);
-            var dataset = Path.Combine(active.Root, "brush-dataset");
+            var dataset = File.Exists(Path.Combine(active.Root, "capture-project.json"))
+                ? Path.Combine(active.Root, "brush", "dataset")
+                : Path.Combine(active.Root, "brush-dataset");
+            Directory.CreateDirectory(Path.GetDirectoryName(dataset)!);
             var sparse = Path.GetDirectoryName(active.Sparse)!;
             // Link both directories, so existing Brush wiring follows every successful replacement.
             if (Targets(Path.Combine(dataset, "images"), active.Images)

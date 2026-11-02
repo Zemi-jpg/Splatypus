@@ -53,6 +53,6 @@ public sealed class BrushDatasetComponent : SpComponent
         if (result.Succeeded) da.SetData(0, result.DatasetPath);
         da.SetData(1, result.Status);
     }
-    public override GH_Exposure Exposure => GH_Exposure.secondary;
+    public override GH_Exposure Exposure => GH_Exposure.primary;
     public override Guid ComponentGuid => new("EABD7F8C-B45B-42A1-B6FE-F72AB4D893AA");
 }
