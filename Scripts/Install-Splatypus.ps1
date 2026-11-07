@@ -1,4 +1,4 @@
-param([string]$SourceFolder = (Join-Path $PSScriptRoot 'dist\windows'))
+param([string]$SourceFolder = (Join-Path (Split-Path -Parent $PSScriptRoot) 'dist\windows'))
 
 $ErrorActionPreference = 'Stop'
 if (Get-Process -Name Rhino -ErrorAction SilentlyContinue) {
@@ -15,7 +15,7 @@ foreach ($file in $fileNames) {
 $libraries = [IO.Path]::GetFullPath((Join-Path ([Environment]::GetFolderPath('ApplicationData')) 'Grasshopper\Libraries'))
 $targetFolder = Join-Path $libraries 'Splatypus'
 $oldFolder = Join-Path $libraries 'RhinoSplat'
-$backupFolder = Join-Path $PSScriptRoot ('bin\PluginBackups\Splatypus-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8))
+$backupFolder = Join-Path (Split-Path -Parent $PSScriptRoot) ('bin\PluginBackups\Splatypus-' + (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8))
 
 # Every move is restricted to an explicitly named immediate child of Libraries.
 foreach ($path in @($oldFolder, $targetFolder)) {

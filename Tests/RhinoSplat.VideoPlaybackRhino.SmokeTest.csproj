@@ -6,13 +6,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="VideoPlaybackRhinoSmoke.cs" />
-    <Compile Include="../GH.VideoFramesComponent.cs" />
-    <Compile Include="../GH.VideoPlaybackComponent.cs" />
-    <Compile Include="../GH.SpComponent.cs" />
-    <Compile Include="../GH.DatasetPorts.cs" />
-    <Compile Include="../GH.ComponentIcons.cs" />
+    <Compile Include="../Source/Grasshopper/GH.VideoFramesComponent.cs" />
+    <Compile Include="../Source/Grasshopper/GH.VideoPlaybackComponent.cs" />
+    <Compile Include="../Source/Grasshopper/GH.SpComponent.cs" />
+    <Compile Include="../Source/Grasshopper/GH.DatasetPorts.cs" />
+    <Compile Include="../Source/Grasshopper/GH.ComponentIcons.cs" />
     <EmbeddedResource Include="../Assets/Icons-Splatypus/png24/camera-planes.png" LogicalName="RhinoSplat.Icons.camera-planes.png" />
-    <Compile Include="../Core.*.cs" Exclude="../Core.ColmapMeshRunner.cs;../Core.ColmapMeshSession.cs;../Core.PlyMeshData.cs" />
+    <Compile Include="../Source/Core/Core.*.cs" Exclude="../Source/Core/Core.ColmapMeshRunner.cs;../Source/Core/Core.ColmapMeshSession.cs;../Source/Core/Core.PlyMeshData.cs" />
     <Reference Include="RhinoCommon"><HintPath>C:\Program Files\Rhino 8\System\netcore\RhinoCommon.dll</HintPath></Reference>
     <Reference Include="Grasshopper"><HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\Grasshopper.dll</HintPath></Reference>
     <Reference Include="GH_IO"><HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\GH_IO.dll</HintPath></Reference>

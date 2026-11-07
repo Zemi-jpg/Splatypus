@@ -5,11 +5,11 @@
     <Nullable>enable</Nullable><EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../GH.SpComponent.cs" />
+    <Compile Include="../Source/Grasshopper/GH.SpComponent.cs" />
     <Compile Include="DatasetPortsSmoke.cs" />
-    <Compile Include="../GH.FFmpegMediaImportComponent.cs;../GH.BrushTrainingComponent.cs;../GH.ColmapFeatureExtractionComponent.cs;../GH.ColmapExhaustiveMatchingComponent.cs" />
-    <Compile Include="../GH.DatasetPorts.cs;../GH.ComponentIcons.cs;../GH.BrushDatasetComponent.cs;../GH.ColmapModelAlignmentComponent.cs;../GH.ColmapImageUndistorterComponent.cs;../GH.ColmapModelExportComponent.cs;../GH.ColmapSparseMapperComponent.cs;../GH.ColmapPipelineComponent.cs;../GH.TrainingDatasetCheckComponent.cs" />
-    <ProjectReference Include="../RhinoSplat.Core.csproj" />
+    <Compile Include="../Source/Grasshopper/GH.FFmpegMediaImportComponent.cs;../Source/Grasshopper/GH.BrushTrainingComponent.cs;../Source/Grasshopper/GH.ColmapFeatureExtractionComponent.cs;../Source/Grasshopper/GH.ColmapExhaustiveMatchingComponent.cs" />
+    <Compile Include="../Source/Grasshopper/GH.DatasetPorts.cs;../Source/Grasshopper/GH.ComponentIcons.cs;../Source/Grasshopper/GH.BrushDatasetComponent.cs;../Source/Grasshopper/GH.ColmapModelAlignmentComponent.cs;../Source/Grasshopper/GH.ColmapImageUndistorterComponent.cs;../Source/Grasshopper/GH.ColmapModelExportComponent.cs;../Source/Grasshopper/GH.ColmapSparseMapperComponent.cs;../Source/Grasshopper/GH.ColmapPipelineComponent.cs;../Source/Grasshopper/GH.TrainingDatasetCheckComponent.cs" />
+    <ProjectReference Include="../Source/RhinoSplat.Core.csproj" />
     <Reference Include="RhinoCommon"><HintPath>C:\Program Files\Rhino 8\System\netcore\RhinoCommon.dll</HintPath></Reference>
     <Reference Include="Grasshopper"><HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\Grasshopper.dll</HintPath></Reference>
     <Reference Include="GH_IO"><HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\GH_IO.dll</HintPath></Reference>

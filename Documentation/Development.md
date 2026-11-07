@@ -15,15 +15,15 @@ The current version is 0.2.0 (formerly planned as 0.1.1). Its tag and GitHub Rel
 Install the .NET 8 SDK. From the repository root:
 
 ```powershell
-dotnet build RhinoSplat.Grasshopper.csproj -c Release
-dotnet build RhinoSplat.Grasshopper.Mac.csproj -c Release
+dotnet build Source/RhinoSplat.Grasshopper.csproj -c Release
+dotnet build Source/RhinoSplat.Grasshopper.Mac.csproj -c Release
 ```
 
 The projects pin RhinoCommon and Grasshopper SDK version 8.34.26223.11001 through NuGet. The Mac build is cross-compiled; native reconstruction and training must be checked on macOS separately. Build outputs use the temporary build root configured in Directory.Build.props.
 
 Viewport capture integration checks are in `Tests/RhinoSplat.ViewCapture.SmokeTest.csproj`. Build with `-c Release -o bin/ViewCapture/tests`, then run `Tests/RunViewCaptureTests.py` through Rhino's `_-RunPythonScript` in a separate test instance. Tests create their own document and retain verification images under `bin/ViewCapture/validation`. They cover image/calibration agreement, native geometry and display conduits, view restoration, cancellation, existing Brush handoff and saved Camera Planes sockets.
 
-Automatic backdrop checks are in `Tests/RhinoSplat.SplatBackground.SmokeTest.csproj` (PLY formats, bounded samples, opacity and robust color fitting) and `Tests/RhinoSplat.AutoBackgroundRhino.SmokeTest.csproj` (camera projection, transforms, Grasshopper outputs, preview modes/restoration and capture socket migration). See [automatic background](../Auto-background.md).
+Automatic backdrop checks are in `Tests/RhinoSplat.SplatBackground.SmokeTest.csproj` (PLY formats, bounded samples, opacity and robust color fitting) and `Tests/RhinoSplat.AutoBackgroundRhino.SmokeTest.csproj` (camera projection, transforms, Grasshopper outputs, preview modes/restoration and capture socket migration). See [automatic background](Features/Auto-background.md).
 
 ## Verify and package
 
@@ -53,6 +53,8 @@ See [the publishing guide](../Publication/Publish-guide.md) for Yak and food4Rhi
 | `Documentation/` | User and developer guides |
 | `Examples/` | Downloadable Grasshopper definition |
 | `Publication/` | Package manual, quick-start PDF, listing artwork and build scripts |
+| `Source/` | Core, Grasshopper and experimental renderer source and projects |
+| `Scripts/` | Local build, installation, packaging and smoke-test helpers |
 | `Tests/` | Existing smoke tests and distribution checks |
 | `dist/publication/` | Versioned Yak/ZIP downloads and checksums |
 

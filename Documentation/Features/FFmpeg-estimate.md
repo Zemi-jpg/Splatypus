@@ -17,7 +17,7 @@ Video durations are read with `ffprobe.exe` beside the selected `ffmpeg.exe`, us
 
 Each video contributes its duration times FPS, rounded to the nearest integer; each still image contributes one. Video timestamps and clip boundaries can make actual extraction counts differ. If any video cannot be probed, Estimate is empty and Probe explains why. Probing creates no project folders, JPEGs or logs. A failed probe does not disable an explicitly requested import.
 
-Build with `dotnet build .\RhinoSplat.Grasshopper.csproj --configuration Debug --no-restore`. Deploy **both** `RhinoSplat.gha` and `RhinoSplat.Core.dll` from the Grasshopper build output, then restart Rhino. If a component saved in an older definition does not show the appended outputs and Cancel input, replace that instance with a fresh `SP Media Import` component.
+Build from the repository root with `dotnet build Source/RhinoSplat.Grasshopper.csproj --configuration Debug`. Deploy **both** `Splatypus.gha` and `Splatypus.Core.dll` from the Grasshopper build output, then restart Rhino. If a component saved in an older definition does not show the appended outputs and Cancel input, replace that instance with a fresh `SP Media Import` component.
 
 The dependency-free smoke harness checks real FFmpeg extraction, controlled metadata/error cases, and the background controller with stalled child processes. All 53 checks passed, covering prompt start/cancel/poll calls, suppression of repeated imports and stale estimates, process cleanup, bounded log previews, and successful asynchronous completion:
 

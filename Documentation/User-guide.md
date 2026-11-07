@@ -44,7 +44,7 @@ Matching-format stills are copied without re-encoding, retaining existing metada
 
 Estimate is the approximate count **before** duplicate filtering. Check coverage after filtering. Imports save surviving-frame timing in `ffmpeg-media.json` beside `images`; keep this record for playback. Importing new media invalidates the previous reconstruction and feature database, so reconstruct again before training.
 
-See [media estimates](../FFmpeg-estimate.md) and [0.2.0 import options](../Version-0.2.0-options.md).
+See [media estimates](Features/FFmpeg-estimate.md) and [0.2.0 import options](Features/Version-0.2.0-options.md).
 
 ## Reconstruct cameras with COLMAP
 
@@ -65,7 +65,7 @@ Geotagged photographs can provide position priors. Drone video telemetry and sid
 
 Connect **Root → SP Active Dataset → Dataset** to **SP Sparse Point Cloud** and **SP Camera Planes** to inspect the result. The project has one active base image/model pair. Optional **SP COLMAP Undistort Images** replaces its images and camera calibration together, updates the text model and clears stale feature data. COLMAP may omit unregistered images during undistortion. Verify transparency afterwards if you rely on alpha.
 
-Reconstruction has no inherent real-world scale without a reference. See [COLMAP and active datasets](../Colmap-pipeline.md) for stage reuse and replacement details.
+Reconstruction has no inherent real-world scale without a reference. See [COLMAP and active datasets](Features/Colmap-pipeline.md) for stage reuse and replacement details.
 
 ## Align the reconstruction to Rhino geometry
 
@@ -96,7 +96,7 @@ Write creates the separate `colmap/aligned` model from the active base. Repeated
 
 Use **Aligned Text Model** for a separate saved-result preview and **Aligned Sparse Model → Brush Dataset → Sparse Model Override** for aligned training. After reconstructing or undistorting again, rewrite the alignment. Keep the base Dataset connected to the alignment source previews.
 
-See [Quick Align](../Quick-alignment.md), [Geometry Translator](../Geometry-translator.md) and [alignment writing](../Alignment-branches.md).
+See [Quick Align](Features/Quick-alignment.md), [Geometry Translator](Features/Geometry-translator.md) and [alignment writing](Features/Alignment-branches.md).
 
 ## Prepare and train with Brush
 
@@ -136,7 +136,7 @@ Playback needs a COLMAP text model with registered cameras matching the frames. 
 
 New imports use saved timestamps, including gaps left by duplicate filtering. For older imports without `ffmpeg-media.json`, connect the original media files or mixed folder to **Video Frames → Media**. Older imports use a default pace of two extracted frames per second; adjust Speed as needed. Dataset changes update automatically; there is no FPS or Refresh input on Video Frames.
 
-See [video frames and playback](../Video-playback.md) for model selection, interpolation and framing limits.
+See [video frames and playback](Features/Video-playback.md) for model selection, interpolation and framing limits.
 
 ## Capture a Rhino scene for retraining
 
@@ -157,7 +157,7 @@ Images go directly into `Root/images`, cameras into `Root/colmap`, and the prepa
 
 **Cancel** preserves saved images under Root/images. Images and Dataset outputs are withheld until the complete batch succeeds. Inspect Status and `capture-progress.txt` after an interruption, then use a fresh Root for another batch.
 
-See [viewport capture](../Viewport-capture.md) for camera conventions, output files and renderer requirements.
+See [viewport capture](Features/Viewport-capture.md) for camera conventions, output files and renderer requirements.
 
 ### Estimate a matching background
 
@@ -170,7 +170,7 @@ See [viewport capture](../Viewport-capture.md) for camera conventions, output fi
 
 Keep the external splat renderer's relighting off when matching its baked appearance. Auto Background changes the viewport fill; it does not reconstruct missing scenery or alter lighting. Inspect Status if boundary samples are sparse or no colors are visible, and verify PLY/camera alignment. Without Frames, it samples the active viewport when it solves; recompute after changing that camera.
 
-See [automatic background](../Auto-background.md) for supported PLY formats and estimation limits.
+See [automatic background](Features/Auto-background.md) for supported PLY formats and estimation limits.
 
 ## Project files and upgrading existing definitions
 

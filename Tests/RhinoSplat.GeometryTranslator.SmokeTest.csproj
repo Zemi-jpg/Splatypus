@@ -8,9 +8,9 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="../GH.SpComponent.cs" />
+    <Compile Include="../Source/Grasshopper/GH.SpComponent.cs" />
     <Compile Include="GeometryTranslatorSmoke.cs" />
-    <Compile Include="..\GH.GeometryTranslatorComponent.cs" Link="GeometryTranslatorComponent.cs" />
+    <Compile Include="../Source/Grasshopper/GH.GeometryTranslatorComponent.cs" Link="GeometryTranslatorComponent.cs" />
     <Reference Include="RhinoCommon"><HintPath>C:\Program Files\Rhino 8\System\netcore\RhinoCommon.dll</HintPath></Reference>
     <Reference Include="Grasshopper"><HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\Grasshopper.dll</HintPath></Reference>
     <Reference Include="GH_IO"><HintPath>C:\Program Files\Rhino 8\Plug-ins\Grasshopper\GH_IO.dll</HintPath></Reference>

@@ -8,6 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="BrushDatasetSmoke.cs" />
-    <ProjectReference Include="..\RhinoSplat.Core.csproj" />
+    <ProjectReference Include="../Source/RhinoSplat.Core.csproj" />
   </ItemGroup>
 </Project>

@@ -53,7 +53,7 @@ $env:DOTNET_NOLOGO = '1'
 Push-Location $root
 try {
     foreach ($platform in $selectedPlatforms) {
-        $project = if ($platform -eq 'windows') { 'RhinoSplat.Grasshopper.csproj' } else { 'RhinoSplat.Grasshopper.Mac.csproj' }
+        $project = if ($platform -eq 'windows') { 'Source/RhinoSplat.Grasshopper.csproj' } else { 'Source/RhinoSplat.Grasshopper.Mac.csproj' }
         $tag = if ($platform -eq 'windows') { 'win' } else { 'mac' }
         $build = Join-Path $work "$platform-build"
         $stage = Join-Path $work "$platform-stage"

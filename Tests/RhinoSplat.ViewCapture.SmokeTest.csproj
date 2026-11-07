@@ -5,8 +5,8 @@
     <Nullable>enable</Nullable><EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ViewCaptureSmoke.cs;../GH.ViewportCapture.cs;../GH.ViewCaptureComponent.cs;../GH.CameraPlanesComponent.cs;../GH.SpComponent.cs;../GH.ComponentIcons.cs" />
-    <ProjectReference Include="../RhinoSplat.Core.csproj" />
+    <Compile Include="ViewCaptureSmoke.cs;../Source/Grasshopper/GH.ViewportCapture.cs;../Source/Grasshopper/GH.ViewCaptureComponent.cs;../Source/Grasshopper/GH.CameraPlanesComponent.cs;../Source/Grasshopper/GH.SpComponent.cs;../Source/Grasshopper/GH.ComponentIcons.cs" />
+    <ProjectReference Include="../Source/RhinoSplat.Core.csproj" />
     <Reference Include="RhinoCommon"><HintPath>C:/Program Files/Rhino 8/System/netcore/RhinoCommon.dll</HintPath></Reference>
     <Reference Include="Grasshopper"><HintPath>C:/Program Files/Rhino 8/Plug-ins/Grasshopper/Grasshopper.dll</HintPath></Reference>
     <Reference Include="GH_IO"><HintPath>C:/Program Files/Rhino 8/Plug-ins/Grasshopper/GH_IO.dll</HintPath></Reference>

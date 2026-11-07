@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Stop'
-Push-Location $PSScriptRoot
+Push-Location (Split-Path -Parent $PSScriptRoot)
 try {
-    dotnet build RhinoSplat.Grasshopper.csproj -c Release -o dist/windows
+    dotnet build Source/RhinoSplat.Grasshopper.csproj -c Release -o dist/windows
     if ($LASTEXITCODE -ne 0) { throw 'Windows build failed' }
-    dotnet build RhinoSplat.Grasshopper.Mac.csproj -c Release -o dist/macos
+    dotnet build Source/RhinoSplat.Grasshopper.Mac.csproj -c Release -o dist/macos
     if ($LASTEXITCODE -ne 0) { throw 'macOS build failed' }
     foreach ($platform in @('windows', 'macos')) {
         $folder = Join-Path 'dist' $platform
@@ -19,14 +19,14 @@ try {
         }
         $zip = if ($platform -eq 'windows') { 'Splatypus-Windows-workflow.zip' } else { 'Splatypus-macOS-workflow.zip' }
         # Stage the example directory alone so legacy notes cannot enter the archive.
-        $zipStage = Join-Path $PSScriptRoot ('bin/manual-package/' + [Guid]::NewGuid().ToString('N'))
+        $zipStage = Join-Path (Split-Path -Parent $PSScriptRoot) ('bin/manual-package/' + [Guid]::NewGuid().ToString('N'))
         New-Item -ItemType Directory -Path (Join-Path $zipStage 'Examples') -Force | Out-Null
         foreach ($name in @('Splatypus.gha', 'Splatypus.Core.dll', 'README.md', 'LICENSE.txt', 'NOTICE.txt', 'Splatypus-Quick-Start.pdf')) { Copy-Item -LiteralPath (Join-Path $folder $name) -Destination $zipStage }
         Copy-Item -LiteralPath (Join-Path $examples 'Splatypus_Workflow.gh') -Destination (Join-Path $zipStage 'Examples')
         $files = @(Get-ChildItem -LiteralPath $zipStage | ForEach-Object FullName)
         Compress-Archive -LiteralPath $files -DestinationPath (Join-Path 'dist' $zip) -Force
     }
-    & (Join-Path $PSScriptRoot 'Tests/VerifyDistributionSdk.ps1')
+    & (Join-Path (Split-Path -Parent $PSScriptRoot) 'Tests/VerifyDistributionSdk.ps1')
 } finally {
     Pop-Location
 }

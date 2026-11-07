@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 if (Get-Process -Name Rhino -ErrorAction SilentlyContinue) {
     throw 'Close all Rhino windows before installing the Download Tools update.'
 }
-$sourceFolder = Join-Path $PSScriptRoot 'dist\windows'
+$sourceFolder = Join-Path (Split-Path -Parent $PSScriptRoot) 'dist\windows'
 $librariesFolder = Join-Path ([Environment]::GetFolderPath('ApplicationData')) 'Grasshopper\Libraries'
 $targetFolder = Join-Path $librariesFolder 'Splatypus'
 foreach ($oldFile in @('RhinoSplat\RhinoSplat.gha', 'RhinoSplat.gha', 'Splatypus\RhinoSplat.gha')) {
@@ -14,7 +14,7 @@ $fileNames = @('Splatypus.gha', 'Splatypus.Core.dll')
 foreach ($fileName in $fileNames) {
     if (-not (Test-Path -LiteralPath (Join-Path $sourceFolder $fileName) -PathType Leaf)) { throw "Build file is missing: $fileName" }
 }
-$backupFolder = Join-Path $PSScriptRoot ('bin\PluginBackups\DownloadTools-' + [Guid]::NewGuid().ToString('N'))
+$backupFolder = Join-Path (Split-Path -Parent $PSScriptRoot) ('bin\PluginBackups\DownloadTools-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $backupFolder -Force | Out-Null
 New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
 foreach ($fileName in $fileNames) {

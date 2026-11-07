@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Stop'
 if (Get-Process -Name Rhino -ErrorAction SilentlyContinue) {
     throw 'Close all Rhino windows before replacing the Grasshopper plugin, then run this script again.'
 }
-$sourceFolder = Join-Path $PSScriptRoot 'bin\GeometryTranslator'
+$sourceFolder = Join-Path (Split-Path -Parent $PSScriptRoot) 'bin\ToolbarOrder'
 $targetFolder = Join-Path ([Environment]::GetFolderPath('ApplicationData')) 'Grasshopper\Libraries\RhinoSplat'
 $fileNames = @('RhinoSplat.gha', 'RhinoSplat.Core.dll')
 foreach ($fileName in $fileNames) {
@@ -10,7 +10,7 @@ foreach ($fileName in $fileNames) {
         throw "Build file is missing: $fileName"
     }
 }
-$backupFolder = Join-Path $PSScriptRoot ('bin\PluginBackups\' + [Guid]::NewGuid().ToString('N'))
+$backupFolder = Join-Path (Split-Path -Parent $PSScriptRoot) ('bin\PluginBackups\' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $backupFolder -Force | Out-Null
 New-Item -ItemType Directory -Path $targetFolder -Force | Out-Null
 foreach ($fileName in $fileNames) {

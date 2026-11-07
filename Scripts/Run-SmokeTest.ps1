@@ -18,8 +18,8 @@ if ($null -eq $sdk -or $null -eq $referencePack) {
 $csc = Join-Path $sdk.FullName 'Roslyn\bincore\csc.dll'
 $referenceDirectory = Join-Path $referencePack.FullName 'ref\net8.0'
 $output = Join-Path $env:TEMP 'RhinoSplat.Core.SmokeTest.dll'
-$source = Join-Path $PSScriptRoot 'Program.cs'
-$runtimeConfig = Join-Path $PSScriptRoot 'RhinoSplat.Core.SmokeTest.runtimeconfig.json'
+$source = Join-Path (Split-Path -Parent $PSScriptRoot) 'Tests/CoreSmokeTest.cs'
+$runtimeConfig = Join-Path (Split-Path -Parent $PSScriptRoot) 'Tests/RhinoSplat.Core.SmokeTest.runtimeconfig.json'
 
 $references = Get-ChildItem $referenceDirectory -Filter '*.dll' |
     ForEach-Object { '/reference:' + $_.FullName }

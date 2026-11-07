@@ -6,6 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="SplatBackgroundSmoke.cs" />
-    <ProjectReference Include="../RhinoSplat.Core.csproj" />
+    <ProjectReference Include="../Source/RhinoSplat.Core.csproj" />
   </ItemGroup>
 </Project>

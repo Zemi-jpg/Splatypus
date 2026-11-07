@@ -8,7 +8,7 @@ This is a Mac-targeted build candidate, compiled on Windows against the pinned R
 2. In Grasshopper, use File > Special Folders > Components Folder to identify the actual Libraries folder. If upgrading from RhinoSplat, move its old plugin folder outside the Components Folder first. Both versions share component IDs and must not be installed together.
 3. Copy `Splatypus.gha` and `Splatypus.Core.dll` from the extracted ZIP together into a `Splatypus` subfolder there. Keep only one installed copy and restart Rhino. Look for the Splatypus tab and platypus icon. The Mac and Windows versions use the same component IDs.
 
-When working from source, the files are built in `dist/macos`; `bash Install-Mac.sh "/absolute/path/to/Grasshopper/Libraries"` installs them.
+When working from source, the files are built in `dist/macos`; `bash Scripts/Install-Mac.sh "/absolute/path/to/Grasshopper/Libraries"` installs them.
 
 ## External tools
 
@@ -50,10 +50,10 @@ The Gaussian splat renderer is absent from this build. Point-cloud preview shows
 Install the .NET 8 SDK and Rhino 8, then:
 
 ```sh
-bash Build-Mac.sh
+bash Scripts/Build-Mac.sh
 ```
 
-The script restores the pinned 8.34 SDK from NuGet, builds `RhinoSplat.Grasshopper.Mac.csproj`, and writes `dist/macos`. The first restore requires internet access. Build references are independent of the locally installed Rhino version. No Windows Desktop framework is required. The renderer project is not built.
+The script restores the pinned 8.34 SDK from NuGet, builds `Source/RhinoSplat.Grasshopper.Mac.csproj`, and writes `dist/macos`. The first restore requires internet access. Build references are independent of the locally installed Rhino version. No Windows Desktop framework is required. The renderer project is not built.
 
 ## Verification
 

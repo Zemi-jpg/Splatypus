@@ -28,7 +28,7 @@ For a manual ZIP, unblock the downloaded ZIP in Windows Properties if the checkb
 
 Place SP Download Tools under 01 Setup. Use a writable Folder, or leave it blank for the per-user RhinoSplat/Tools location. On Windows select CUDA=False for CPU COLMAP, or CUDA=True when using an NVIDIA CUDA installation. Connect a Button to Download and wait for Ready=True. Connect the returned executable paths to later Exe inputs.
 
-Startup validation does not verify training GPU compatibility. Manual tool paths are accepted. FFprobe must sit beside FFmpeg. See [Download Tools](../Download-tools.md) for versions, network sources, checksums, recovery and the Apple Silicon package environments.
+Startup validation does not verify training GPU compatibility. Manual tool paths are accepted. FFprobe must sit beside FFmpeg. See [Download Tools](Features/Download-tools.md) for versions, network sources, checksums, recovery and the Apple Silicon package environments.
 
 ## Update and uninstall
 

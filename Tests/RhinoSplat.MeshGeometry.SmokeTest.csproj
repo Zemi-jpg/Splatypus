@@ -4,8 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="MeshGeometrySmoke.cs;../GH.ColmapMeshGeometry.cs" />
-    <ProjectReference Include="../RhinoSplat.Core.csproj" />
+    <Compile Include="MeshGeometrySmoke.cs;../Source/Grasshopper/GH.ColmapMeshGeometry.cs" />
+    <ProjectReference Include="../Source/RhinoSplat.Core.csproj" />
     <Reference Include="RhinoCommon"><HintPath>C:/Program Files/Rhino 8/System/netcore/RhinoCommon.dll</HintPath></Reference>
   </ItemGroup>
 </Project>

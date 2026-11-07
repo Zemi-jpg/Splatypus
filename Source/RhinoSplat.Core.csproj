@@ -7,8 +7,8 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
 
-  <Import Project="Publication/Splatypus.Release.props" />
+  <Import Project="../Publication/Splatypus.Release.props" />
   <ItemGroup>
-    <Compile Include="Core.*.cs" Exclude="Core.ColmapMeshRunner.cs;Core.ColmapMeshSession.cs;Core.PlyMeshData.cs" />
+    <Compile Include="Core/Core.*.cs" Exclude="Core/Core.ColmapMeshRunner.cs;Core/Core.ColmapMeshSession.cs;Core/Core.PlyMeshData.cs" />
   </ItemGroup>
 </Project>

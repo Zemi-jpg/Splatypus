@@ -14,6 +14,6 @@
 
 Rounded strokes around 1.65 px; small optical adjustments per glyph. FFmpeg uses green with its folded diagonal motif. COLMAP uses slate facets and red feature points. Brush uses its blue handle, pale ferrule, and red paint tip. Shared project and transformation actions use teal. Each component has a distinct silhouette; colour is a secondary cue. Backgrounds remain transparent, including cutouts under action arrows and checkmarks.
 
-The cached resource loader in `GH.ComponentIcons.cs` detaches each bitmap from its resource stream. All 20 component classes expose their assigned icon. The assembly uses Hello Splat as its provisional icon; no new plugin name has been chosen.
+The cached resource loader in `Source/Grasshopper/GH.ComponentIcons.cs` detaches each bitmap from its resource stream. All 20 component classes expose their assigned icon. The assembly uses Hello Splat as its provisional icon; no new plugin name has been chosen.
 
 The artwork is embedded in the build and requires no external asset directory at runtime. No component identifiers or input/output definitions are changed. Native Grasshopper display, particularly on macOS, still requires a runtime visual check.
